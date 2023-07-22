@@ -7,7 +7,7 @@ extern pthread_cond_t PR;
 extern pool_t* pool;
 extern int epfd;
 extern int serverfd;
-
+extern pthread_mutex_t mapmutex;
 
 void thread_pool_destroy(){
 	for(int i=0;i<pool->max;i++){
@@ -25,6 +25,8 @@ void thread_pool_destroy(){
 	printf("destory P\n");
 	pthread_join(pool->Pt,NULL);
 	pthread_join(pool->Al,NULL);
+
 	free(pool->ct);
 	free(pool);
+	pthread_mutex_destroy(&mapmutex);
 }

@@ -3,6 +3,7 @@
 using namespace std;
 extern int serverfd;
 extern map<SOCKET,int> m_AliveLoseCount;
+extern pthread_mutex_t mapmutex;
 
 ckernel::ckernel()
 {
@@ -16,11 +17,11 @@ ckernel::ckernel()
 	cout<<"连接成功"<<endl;
 	char mysql[] = "update t_user set status = 0;\0";
 	if (!sql.UpdateMySql(mysql)){
-		    cout << "sqlBuf:" << mysql << endl;
-			    cout << "userName 更新数据库错误" << endl;
-				    return;
+		cout << "sqlBuf:" << mysql << endl;
+		cout << "userName 更新数据库错误" << endl;
+		return;
 	}
-
+	PFUNinit();
 	//Epoll 头文件使用了网络初始化
 }
 
@@ -31,137 +32,49 @@ ckernel::~ckernel()
 	close(serverfd);
 }
 
+void ckernel::PFUNinit(){
+	m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_]=&ckernel::Del_Login;
+	m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_] = &ckernel::Del_Online;
+	m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_] = &ckernel::Del_Offline;
+	m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Register;
+	m_netProtocolMap[_def_PROTOCOL_friend_INFO - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Friend_Info;
+	m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Add_Friend;
+	m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Chat;
+	m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Join;
+	m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Create;
+	m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Leave;
+	m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Play;
+	m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Add_RS;
+	m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_] =&ckernel::Del_House_Info;
+	m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_] =&ckernel::Del_House_Reflush;
+	m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Playing;
+	m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_] =&ckernel::Del_PlayCheak;
+	m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_] =&ckernel::Deal_Failed;
+	m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_] =&ckernel::Deal_Alive_Test;
+	m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_] =&ckernel::Deal_Delete_Reflush;
+	m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_] =&ckernel::Deal_HouseNumber;
+	m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_] =&ckernel::Deal_HostAsk;
+	m_netProtocolMap[_def_PROTOCOL_DelFriend - _DEF_PROTOCOL_BASE_] =&ckernel::DeleteFriend;
+	m_netProtocolMap[_def_PROTOCOL_WaitOk - _DEF_PROTOCOL_BASE_] =&ckernel::Del_WaitOk;
+	m_netProtocolMap[_def_PROTOCOL_VSanwser - _DEF_PROTOCOL_BASE_] =&ckernel::Del_VsAnswerGame; 
+	m_netProtocolMap[_def_PROTOCOL_History - _DEF_PROTOCOL_BASE_] = &ckernel::Del_vsHistory;
+}
+
+
 void ckernel::Deal(SOCKET ISendIp,int t,char*buf,int len)
 {
 	//根据协议，划分功能
 	//函数里面与数据库交互
 	cout <<"type: "<< t << endl;
-	switch (t) {
-	case _DEF_PROTOCOL_Login_:
-		m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_] =
-&ckernel::Del_Login;
-		Del_Login(ISendIp, buf, len);
-		break;
-	case _DEF_PROTOCOL_ONLINE_: 
-		m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Online;
-	(this->*m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, len);
-	break;
-	case _DEF_PROTOCOL_OFFLINE_:
-		m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Offline;
-		(this->*m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case _def_PROTOCOL_register_:
-		m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Register;
-		(this->*m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case _def_PROTOCOL_friend_INFO:
-		m_netProtocolMap[_def_PROTOCOL_friend_INFO - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Friend_Info;
-		(this->*m_netProtocolMap[_def_PROTOCOL_friend_INFO - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case _def_PROTOCOL_add_friend_:
-		m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Add_Friend;
-		(this->*m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case  _def_PROTOCOL_chat_:
-		m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Chat;
-		(this->*m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case  _def_PROTOCOL_Join_:
-		m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Join;
-		(this->*m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case  _def_PROTOCOL_Create_:
-		m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Create;
-		(this->*m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case  _def_PROTOCOL_Leave_:
-		m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Leave;
-		(this->*m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-	break;
-	case  _def_PROTOCOL_Play_:
-		m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Play;
-		(this->*m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	break;
-	case _def_PROTOCOL_add_friend_rs2:
-		m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Add_RS;
-		(this->*m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_House_List:
-		m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_House_Info;
-		(this->*m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_reflush:
-		m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_House_Reflush;
-		(this->*m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_STRU_PLAY_Process:
-		m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_Playing;
-		(this->*m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_STRU_PLAY_Cheak:
-		m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Del_PlayCheak;
-		(this->*m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_STRU_MyFailed:
-		m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Deal_Failed;
-		(this->*m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_AliveTest:
-		m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Deal_Alive_Test;
-		(this->*m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_DeleteHouseReflush:
-		m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Deal_Delete_Reflush;
-		(this->*m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;	
-	case _def_PROTOCOL_HouseNumberReflush:
-			m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Deal_HouseNumber;
-		(this->*m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break; 
-	case _def_PROTOCOL_AskHostJoin:
-		m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_] =
-			&ckernel::Deal_HostAsk;
-		(this->*m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break; 
-	case _def_PROTOCOL_DelFriend:
-		m_netProtocolMap[_def_PROTOCOL_DelFriend - _DEF_PROTOCOL_BASE_] =
-			&ckernel::DeleteFriend;
-		(this->*m_netProtocolMap[_def_PROTOCOL_DelFriend - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	case _def_PROTOCOL_WaitOk:
-		 m_netProtocolMap[_def_PROTOCOL_DelFriend - _DEF_PROTOCOL_BASE_] =
-		 	&ckernel::Del_WaitOk;
-		(this->*m_netProtocolMap[_def_PROTOCOL_DelFriend - _DEF_PROTOCOL_BASE_])(ISendIp, buf, len);
-		break;
-	default:
-		cout << "unkonw connect!  error void ckernel::Deal" << endl;
+	if(t>_DEF_PROTOCOL_BASE_&&t<_DEF_PROTOCOL_BASE_+_DEF_PROTOCOL_COUNT&&m_netProtocolMap[t-_DEF_PROTOCOL_BASE_]!=nullptr){
+		(this->*m_netProtocolMap[t-_DEF_PROTOCOL_BASE_])(ISendIp,buf, len);
 	}
 }
 
 void  ckernel::Del_Login(SOCKET ISendIp, char* buf, int len) {
 	STRU_LOGIN* rq = (STRU_LOGIN*) buf;
 	STRU_LOGIN rs;
-	
+
 	char sqlBuf[1024] = "";
 	list<string> listRes;
 	sprintf(sqlBuf, "select status from t_user where userid ='%s';", rq->szName);
@@ -277,24 +190,24 @@ void ckernel::Del_Add_RS(SOCKET ISendIp, char* buf, int len)
 	if (1 == rq->result) {
 		char sqlBuf[1024] = "";
 		sprintf(sqlBuf, "insert into t_friend value('%s','%s');", rq->userName, rq->friendName);
-		
+
 		if (!sql.UpdateMySql(sqlBuf)) {
 			cout << "sqlBuf:" << sqlBuf << endl;
 			cout << "userName 更新数据库错误" << endl;
-			
+
 			return;
 		}
 
-		
+
 		memset(sqlBuf,0,sizeof(sqlBuf));
 		sprintf(sqlBuf, "insert into t_friend value('%s','%s');", rq->friendName, rq->userName);
 		if (!sql.UpdateMySql(sqlBuf)) {
 			cout << "sqlBuf:" << sqlBuf << endl;
 			cout << "userName 更新数据库错误" << endl;
-			
+
 			return;
 		}
-		
+
 		// rq->userName
 		cout << "my id" << rq->userName <<"friend id is"<<rq->friendName<< endl;
 		//添加好友信息
@@ -303,7 +216,7 @@ void ckernel::Del_Add_RS(SOCKET ISendIp, char* buf, int len)
 	else {
 		send(m_mapUseridToSocket[rq->userName], rq, rq->size, 0);
 	}
-		
+
 }
 
 void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
@@ -343,11 +256,11 @@ void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
 
 	}else {
 		sprintf(sqlBuf, "insert into t_user (userid,password) values('%s', '%s');",rq->userName,rq->password);
-		
+
 		if (!sql.UpdateMySql(sqlBuf)) {
 			cout << "sqlBuf:" << sqlBuf << endl;
 			cout << " UpdateMySql 数据库更新错误";
-		
+
 			return;
 		}
 
@@ -355,7 +268,14 @@ void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
 	}
 
 	send(ISendIp, (char*)&rs, rs.size,0);
+	bzero(sqlBuf,sizeof(sqlBuf));
+	sprintf(sqlBuf,"insert into t_score (userid) values('%s');",rq->userName);
+	if (!sql.UpdateMySql(sqlBuf)) {
+		cout << "sqlBuf:" << sqlBuf << endl;
+		cout << " UpdateMySql 数据库更新错误";
 
+		return;
+	}
 }
 
 void ckernel::Del_Online(SOCKET ISendIp, char* buf, int len)
@@ -386,8 +306,10 @@ void ckernel::Del_Offline(SOCKET ISendIp, char* buf, int len)
 	cout << "OFFline success" << endl;
 	close(m_mapUseridToSocket[rq->userName]);
 	//于是在 alive 里面关闭
+	pthread_mutex_lock(&mapmutex);
 	m_AliveLoseCount[ISendIp] = -5;//alive 看到-1就直接删除
-	//这里关闭  可能导致 alive线程错误
+	m_mapUseridToSocket.erase(rq->userName);
+	pthread_mutex_unlock(&mapmutex);
 }
 
 void ckernel::Del_Friend(SOCKET ISendIp, char* buf, int len)
@@ -453,22 +375,22 @@ void ckernel::Del_Add_Friend(SOCKET ISendIp, char* buf, int len)
 
 		cout << rs.friendName << "  " << rs.userName << endl;
 
-			cout << "已发送好友请求" << endl;
-			SOCKET sock = m_mapUseridToSocket[rs.friendName];
-			strcpy(rs.friendName, add_success);
-			STRU_ADD_RS rs2;
-			strcpy( rs2.userName, rq->userName);
-			strcpy(rs2.friendName, rq->friendName);
+		cout << "已发送好友请求" << endl;
+		SOCKET sock = m_mapUseridToSocket[rs.friendName];
+		strcpy(rs.friendName, add_success);
+		STRU_ADD_RS rs2;
+		strcpy( rs2.userName, rq->userName);
+		strcpy(rs2.friendName, rq->friendName);
 
-			send(ISendIp, (char*)&rs, rs.size,0);
+		send(ISendIp, (char*)&rs, rs.size,0);
 
-			send(sock, (char*)&rs2, rs2.size,0);//把登陆请求返还给qt  让qt处理rq  vs这里只是核对有没有这个人  因为还有个是否同意
-			//这里只是发信息成功
-			return;
+		send(sock, (char*)&rs2, rs2.size,0);//把登陆请求返还给qt  让qt处理rq  vs这里只是核对有没有这个人  因为还有个是否同意
+		//这里只是发信息成功
+		return;
 
 
 	}
-	
+
 }
 
 void ckernel::Del_Join(SOCKET ISendIp, char* buf, int len)
@@ -492,7 +414,7 @@ void ckernel::Del_Join(SOCKET ISendIp, char* buf, int len)
 		send(ISendIp, (char*)&rq, rq.size,0);
 		return;
 	}
-	 
+
 
 	while (listRes.size() > 0) listRes.pop_front();
 	memset(sqlBuf, 0, sizeof(sqlBuf));
@@ -622,7 +544,7 @@ void ckernel::Del_Create(SOCKET ISendIp, char* buf, int len)
 		send(ISendIp,(char*)&rs, rs.size,0);
 		return;
 	};
-	
+
 	for (auto ite = m_mapUseridToSocket.begin(); ite != m_mapUseridToSocket.end(); ite++) {
 		if(ite->second!= ISendIp)
 			send(ite->second, (char*)&rq, rq.size,0);
@@ -674,7 +596,7 @@ void ckernel::Del_Leave(SOCKET ISendIp, char* buf, int len)
 			}
 			tru = true;
 			break;
-			
+
 		}
 
 		listRes.pop_front();
@@ -698,9 +620,9 @@ void ckernel::Del_Leave(SOCKET ISendIp, char* buf, int len)
 }
 
 void ckernel::Del_WaitOk(SOCKET ISendIp, char* buf, int len){
-	 STRU_WaitOk*  rs = (STRU_WaitOk*)buf;
-	 cout<<"friendname is "<<rs->friendname<<endl;
-	 send(m_mapUseridToSocket[rs->friendname], (char*)rs,rs->size, 0);
+	STRU_WaitOk*  rs = (STRU_WaitOk*)buf;
+	cout<<"friendname is "<<rs->friendname<<endl;
+	send(m_mapUseridToSocket[rs->friendname], (char*)rs,rs->size, 0);
 
 }
 
@@ -799,7 +721,7 @@ void ckernel::Del_Playing(SOCKET ISendIp, char* buf, int len) {
 	STRU_PLAY_Process rs = *(STRU_PLAY_Process*)buf;
 	cout << rs.x << "  " << rs.y << "  " <<rs.change<< endl;
 	send(m_mapUseridToSocket[rs.username1], (char*)&rs, rs.size,0);
-	
+
 }
 void ckernel::Del_House_Info(SOCKET ISendIp, char* buf, int len) {
 	STRU_HOUSE_INFO rs=*(STRU_HOUSE_INFO*)buf;
@@ -807,7 +729,7 @@ void ckernel::Del_House_Info(SOCKET ISendIp, char* buf, int len) {
 	list<string> listRes;
 	char sqlBuf[1024] = "";
 	sprintf(sqlBuf, "select hostname from t_house where housename ='%s';",rs.HouseName);
-	
+
 	if (!sql.SelectMySql(sqlBuf, 1, listRes)) {
 		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
 		cout << "sqlBuf:" << sqlBuf << endl;
@@ -815,14 +737,14 @@ void ckernel::Del_House_Info(SOCKET ISendIp, char* buf, int len) {
 		return;
 	}
 
-	 while(listRes.size() > 0) {
-		
-		 rs.nType = _def_PROTOCOL_House_List;
-		 if (listRes.front() == userid) {
-			 listRes.pop_front();
-			 listRes.pop_front();
-			 if (listRes.size() <= 0) break;
-		 }
+	while(listRes.size() > 0) {
+
+		rs.nType = _def_PROTOCOL_House_List;
+		if (listRes.front() == userid) {
+			listRes.pop_front();
+			listRes.pop_front();
+			if (listRes.size() <= 0) break;
+		}
 		strcpy(rs.username, listRes.front().c_str());
 		listRes.pop_front();
 
@@ -831,7 +753,7 @@ void ckernel::Del_House_Info(SOCKET ISendIp, char* buf, int len) {
 		send(ISendIp, (char*)&rs,rs.size,0);
 
 		memset(&rs, 0, sizeof(STRU_HOUSE_INFO));
-	 }
+	}
 }
 void ckernel::Del_PlayCheak(SOCKET ISendIp, char* buf, int len) {
 	//判断双方有没有确认
@@ -869,7 +791,7 @@ void ckernel::Del_House_Reflush(SOCKET ISendIp, char* buf, int len)
 		cout << rs.HouseName << endl;
 		send(ISendIp, (char*)&rs,rs.size,0);
 	}
-	
+
 }
 void ckernel::Deal_Failed(SOCKET ISendIp, char* buf, int len) {
 	STRU_PLAY_Cheak rs = *(STRU_PLAY_Cheak*)buf;
@@ -918,7 +840,7 @@ void ckernel::Deal_Delete_Reflush(SOCKET ISendIp, char* buf, int len)
 void ckernel::Deal_HouseNumber(SOCKET ISendIp, char* buf, int len) {
 	cout << "Deal_HouseNumber" << endl;
 	STRU_HouseNumReflush rq = *(STRU_HouseNumReflush*)buf;
-	
+
 	if (strcmp(rq.hostname, "DEL") != 0) {
 		list<string> listRes;
 		char sqlBuf[1024] = "";
@@ -966,15 +888,15 @@ void ckernel::Deal_HostAsk(SOCKET ISendIp, char* buf, int len) {
 		list<string> listRes;
 		char sqlBuf[1024] = "";
 		sprintf(sqlBuf, "update t_house set AImode = 0 where housename ='%s';", rq.HouseName);
-	
+
 		if (!sql.UpdateMySql(sqlBuf)) {
 			//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
 			cout << "sqlBuf:" << sqlBuf << endl;
 			cout << "更新数据库错误" << endl;
-			
+
 			return;
 		}
-	
+
 	}
 	cout << "rq.username" <<rq.username<<"rq.username1"<<rq.username1<< endl;
 	rq.nType = _def_PROTOCOL_AskHostJoin;
@@ -988,15 +910,15 @@ void ckernel::DeleteFriend(SOCKET ISendIp, char* buf, int len) {
 	char sqlBuf[1024] = "";
 
 	sprintf(sqlBuf, "delete from t_friend where idA ='%s' and idB='%s';", rq.username,rq.username1);
-	
+
 	if (!sql.UpdateMySql(sqlBuf)) {
 		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
 		cout << "sqlBuf:" << sqlBuf << endl;
 		cout << "更新数据库错误" << endl;
-	
+
 		return;
 	}
-	
+
 	memset(sqlBuf, 0, sizeof(sqlBuf));
 	sprintf(sqlBuf, "delete from t_friend where idA ='%s' and idB='%s';", rq.username1, rq.username);
 
@@ -1006,57 +928,80 @@ void ckernel::DeleteFriend(SOCKET ISendIp, char* buf, int len) {
 		cout << "更新数据库错误" << endl;
 		return;
 	}
-	
+
 }
 
-//void ckernel::getUserlist(SOCKET ISendIp, char* userid) {
-//	STRU_INFO userinfo;
-//	
-//	userinfo.state = 1;
-//	strcpy(userinfo.userName, userid);
-//
-//	if (m_mapUseridToSocket.find(userid) != m_mapUseridToSocket.end()) {
-//		Mediator->net->SendData(m_mapUseridToSocket[userid], (char*)&userinfo, BufSize);
-//	}
-//	else {
-//		cout << "userid的socket不存在" << endl;
-//	}
-//
-//	list<string> listRes;
-//
-//	char sqlBuf[1024] = "";
-//	sprintf(sqlBuf, "select idB from t_friend where idA = '%s';", userid);
-//	//如果只用rq->tel查询password,userid   就可以不用那么多  pop_front();去清除无用信息了
-//
-//	if (!sql.SelectMySql(sqlBuf, 1, listRes)) {
-//
-//		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
-//
-//		cout << "sqlBuf:" << sqlBuf << endl;
-//		cout << "更新数据库错误" << endl;
-//		return;
-//	}
-//
-//	string friendid = 0;
-//	STRU_INFO friendinfo;
-//	while (listRes.size() > 0) {
-//		friendid = listRes.front().c_str();
-//		listRes.pop_front();
-//
-//		if (m_mapUseridToSocket.find(friendid) != m_mapUseridToSocket.end()) {
-//
-//			friendinfo.state = 1;
-//			userinfo.state = 1;
-//			Mediator->net->SendData(m_mapUseridToSocket[friendid], (char*)&userinfo);
-//
-//		}
-//		else {
-//			friendinfo.state = 0;
-//			cout << "friend不在线" << endl;
-//		}
-//
-//		Mediator->net->SendData(m_mapUseridToSocket[userid], (char*)&friendinfo);
-//	}
-//
-//}
+void ckernel::Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len){
+	STRU_VsAnswer rq = *(STRU_VsAnswer*)buf;
+	cout<<"======================================================="<<endl;
+	cout<<"type is "<<rq.shouldDo<<endl;
+	cout<<"winname is "<<rq.Winname<<endl;
+	cout<<"username is "<<rq.username<<endl;
+	cout<<"friendname is "<<rq.friendname<<endl;
+	//friendname 会有为null的干扰
+	if(rq.shouldDo=='a'){
+		char sqlBuf[1024] = "";
+		sprintf(sqlBuf,"insert into t_game value('%s','%s','%s',now(),now());",rq.username,rq.friendname,rq.Winname);
+		if (!sql.UpdateMySql(sqlBuf)) { 
+			cout << "sqlBuf:" << sqlBuf << endl; 
+			cout << "userName 更新数据库错误" << endl;
+			return;
+		}
 
+	}else if(rq.shouldDo=='b'){
+		cout<<"b is update "<<endl;
+		char sqlBuf[1024] = "";
+		sprintf(sqlBuf,"update t_game set EndTime =now() ,win ='%s' where Time =(select ub.Time from (select *from t_game where idA='%s' and idB= '%s' order by Time desc limit 0,1) ub);",rq.Winname,rq.username,rq.friendname);
+		if (!sql.UpdateMySql(sqlBuf)) { 
+			cout << "sqlBuf:" << sqlBuf << endl;
+			cout << "userName 更新错误" << endl;
+			return; 
+
+		}
+		bzero(sqlBuf,sizeof(sqlBuf));
+		sprintf(sqlBuf,"delete from t_game where win ='No' and idA='%s' and idB='%s';",rq.username,rq.friendname);
+		if (!sql.UpdateMySql(sqlBuf)) {
+			cout << "sqlBuf:" << sqlBuf << endl;
+			cout << "t_score error" << endl;
+			return;
+		}
+
+
+
+	}
+}
+void  ckernel::Del_vsHistory(SOCKET ISendIp, char* buf, int len){
+	STRU_VsHistory rq = *(STRU_VsHistory*)buf;
+	list<string> listRes;
+	char sqlBuf[1024] = "";
+	//更新对面的
+	sprintf(sqlBuf,"update t_score set times = (select count('%s') from t_game where idA = '%s'or idB='%s' and win !='No') where userid = '%s' ;",rq.username,rq.username,rq.username,rq.username);
+
+	if (!sql.UpdateMySql(sqlBuf)) {
+		cout << "sqlBuf:" << sqlBuf << endl;
+		cout << "t_score error" << endl;
+		return;
+	}
+	bzero(sqlBuf,sizeof(sqlBuf));
+	sprintf(sqlBuf,"update t_score set win =(select count('%s') from t_game where win ='%s') where userid ='%s';",rq.username,rq.username,rq.username);
+
+	if (!sql.UpdateMySql(sqlBuf)) {
+		cout << "sqlBuf:" << sqlBuf << endl;
+		cout << "t_score 2  error" << endl;
+		return;
+	}
+
+	bzero(sqlBuf,sizeof(sqlBuf));
+	sprintf(sqlBuf,"select times,win from t_score where userid ='%s';",rq.username);
+	if (!sql.SelectMySql(sqlBuf, 2, listRes)) {
+		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
+		cout << "sqlBuf:" << sqlBuf << endl;
+		cout << "更新数据库错误" << endl;
+		return;
+	}
+	rq.SumVs= atoi(listRes.front().c_str());
+	listRes.pop_front();
+	rq.win= atoi(listRes.front().c_str());
+	send(ISendIp, (char*)&rq,rq.size, 0);
+
+}

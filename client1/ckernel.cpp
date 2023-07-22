@@ -8,6 +8,7 @@ extern     ckernel* kernel;
 int OfflineAble =1;
 ckernel::ckernel(QObject *parent) : QObject(parent)
 {
+
     Mediator = new NetMediator;
     m_wnd = new MainWindow;
     m_Ground = new Ground;
@@ -46,9 +47,11 @@ ckernel::ckernel(QObject *parent) : QObject(parent)
      connect(gameList,SIGNAL(on_sendask_Cheak(string)),this,SLOT(On_Deal_PlayCheak(string)));
      connect(gameList,SIGNAL(on_sendFaile()),this,SLOT(On_Deal_Failed()));
      connect(m_Ground,SIGNAL(on_Ai_Game()),gameList,SLOT(on_Deal_AIgame()));
-
      connect(m_Ground,SIGNAL(on_ShowSetting()),this,SLOT(On_Deal_ShowSetting()));
      connect(m_wnd,SIGNAL(on_closeN()),this,SLOT(On_Deal_CloseNow()));
+     connect(gameList,SIGNAL(on_EndVsgame(string,string,string)),this,SLOT(On_Deal_SendVsMsg(string,string,string)));
+     connect(m_Ground,SIGNAL(on_GetVshistory()),this,SLOT(On_Deal_GetVsHistory()));
+     PFUNinit();
        Mediator->Net_Init(port,ip);
        Mediator->Net_Connect();
     m_wnd->show();
@@ -127,136 +130,67 @@ ckernel::~ckernel()
     exit(-1);
 }
 
+void ckernel::PFUNinit(){
+    m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Login;
+    m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Online;
+    m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Offline;
+    m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Register;
+    m_netProtocolMap[_def_PROTOCOL_friend_INFO_RS - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Friend_Info;
+    m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Add_Friend;
+    m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Chat;
+    m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Join;
+    m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Create;
+    m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Leave;
+    m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Play;
+    m_netProtocolMap[_def_PROTOCOL_add_friend_rs1 - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Friend;
+    m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_fin_friend;
+    m_netProtocolMap[_def_PROTOCOL_Create_Rs - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_Create_rs;
+    m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_] =
+        &ckernel::Del_House_Info;
+      m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_] =&ckernel::Del_House_Reflush;
+       m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Playing;
+       m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_PlayCheak;
+       m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_Failed;
+       m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_AliveTest;
+       m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_DeleteReflush;
+       m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_HouseNumber;
+       m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_HostAsk;
+       m_netProtocolMap[_def_PROTOCOL_WaitOk - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_WaitOk;
+       m_netProtocolMap[_def_PROTOCOL_History - _DEF_PROTOCOL_BASE_] =
+           &ckernel::Del_Vshistory;
+
+}
+
+
 void ckernel::Deal(long ISendIp, char* buf, int nLen)
 {
     //根据协议，划分功能
     //函数里面与数据库交互
     int type = *(int*)buf;
     cout<<"type:  "<<type<<"size: "<<nLen<<endl;
-    switch (type) {
-    case _DEF_PROTOCOL_Login_:
-        m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Login;
-        (this->*m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-    case _DEF_PROTOCOL_ONLINE_:
-        m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Online;
-    (this->*m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case _DEF_PROTOCOL_OFFLINE_:
-        m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Offline;
-        (this->*m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case _def_PROTOCOL_register_:
-        m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Register;
-        (this->*m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case _def_PROTOCOL_friend_INFO_RS:
-        m_netProtocolMap[_def_PROTOCOL_friend_INFO_RS - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Friend_Info;
-        (this->*m_netProtocolMap[_def_PROTOCOL_friend_INFO_RS - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case _def_PROTOCOL_add_friend_:
-        m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Add_Friend;
-        (this->*m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case  _def_PROTOCOL_chat_:
-        m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Chat;
-        (this->*m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case  _def_PROTOCOL_Join_:
-        m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Join;
-        (this->*m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case  _def_PROTOCOL_Create_:
-        m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Create;
-        (this->*m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case  _def_PROTOCOL_Leave_:
-        m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Leave;
-        (this->*m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-    case  _def_PROTOCOL_Play_:
-        m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_Play;
-        (this->*m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-    case _def_PROTOCOL_add_friend_rs1:
-            m_netProtocolMap[_def_PROTOCOL_add_friend_rs1 - _DEF_PROTOCOL_BASE_] =
-                &ckernel::Del_Friend;
-            (this->*m_netProtocolMap[_def_PROTOCOL_add_friend_rs1 - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-            break;
-    case _def_PROTOCOL_add_friend_rs2:
-            m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_] =
-                &ckernel::Del_fin_friend;
-            (this->*m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-            break;
-
-       case     _def_PROTOCOL_Create_Rs:
-    m_netProtocolMap[_def_PROTOCOL_Create_Rs - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Create_rs;
-    (this->*m_netProtocolMap[_def_PROTOCOL_Create_Rs - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-    break;
-
-    case _def_PROTOCOL_House_List:
-        m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_House_Info;
-        (this->*m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-    case _def_PROTOCOL_reflush:
-             m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_] =&ckernel::Del_House_Reflush;
-             (this->*m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-             break;
-    case _def_PROTOCOL_STRU_PLAY_Process:
-             m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Playing;
-             (this->*m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-             break;
-    case _def_PROTOCOL_STRU_PLAY_Cheak:
-            m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_] =
-                &ckernel::Del_PlayCheak;
-            (this->*m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-            break;
-    case _def_PROTOCOL_STRU_MyFailed:
-            m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_] =
-                &ckernel::Del_Failed;
-            (this->*m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-            break;
-    case _def_PROTOCOL_AliveTest:
-            m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_] =
-                &ckernel::Del_AliveTest;
-            (this->*m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-            break;
-    case _def_PROTOCOL_DeleteHouseReflush:
-        m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_DeleteReflush;
-        (this->*m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-    case _def_PROTOCOL_HouseNumberReflush:
-        m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_HouseNumber;
-        (this->*m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-    case _def_PROTOCOL_AskHostJoin:
-        m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_HostAsk;
-        (this->*m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-    case _def_PROTOCOL_WaitOk:
-        m_netProtocolMap[_def_PROTOCOL_WaitOk - _DEF_PROTOCOL_BASE_] =
-            &ckernel::Del_WaitOk;
-        (this->*m_netProtocolMap[_def_PROTOCOL_WaitOk - _DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
-        break;
-
-    default:
-        cout << "unkonw connect!  error void ckernel::Deal" << endl;
+    if(type>_DEF_PROTOCOL_BASE_&&type<_DEF_PROTOCOL_BASE_+_DEF_PROTOCOL_COUNT&&m_netProtocolMap[type-_DEF_PROTOCOL_BASE_]!=nullptr){
+        (this->*m_netProtocolMap[type-_DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
     }
 
 }
@@ -506,19 +440,20 @@ void ckernel::Del_Create_rs(long ISendIp, char* buf, int nLen){
            return;
       }
       if(strcmp(rs.HouseName,"-1")==0){
-             QMessageBox::about(m_Ground,"提示","出现同名房间或者已经创建房间");
+             QMessageBox::about(m_Ground,"提示","出现同名房间\n[暂时不支持中文]");
              return ;
       }
       m_houseL->HosueName = rs.HouseName;
       m_houseL->show();
       m_houseL->AddItem(rs.hostName);
-
+    m_houseL->startPb();
       m_house.push_back(new House);
       auto ite = m_house.rbegin();
       (*ite)->SetHouseName(m_houseL->HosueName);
       m_Ground->AddItem( (*ite));
       connect( (*ite),SIGNAL(on_join_house(string)),this,SLOT(On_Deal_JOIN(string)));
       m_houname->hide();
+
 }
 
 void ckernel::Del_House_Info(long ISendIp, char* buf, int nLen){
@@ -539,6 +474,7 @@ void ckernel::Del_Leave(long ISendIp, char* buf, int nLen)
         m_houseL->hide();
     }
     m_houseL->deleteItem(rs.UserName);
+
 }
 void ckernel::Del_Playing(long ISendIp, char* buf, int nLen){
     cout<<"get msg\n";
@@ -571,7 +507,7 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
               strcpy(rq.username1,rs.username);
 
               Mediator->net->Send((char*)&rq,rq.size);
-
+              gameList->show();
               gameList->Pix=QPixmap(600, 600);
               gameList->Pix.fill(Qt::white);
               gameList->first =true;
@@ -584,7 +520,8 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
               gameList->SetName(rs.username);
               gameList->againestName = rs.username;
               QMessageBox::about(m_wnd,"提示","发起者为白棋，您是黑棋");
-              gameList->show();
+
+
 
            } else if (msgBox.clickedButton() == Button1) {
               STRU_PLAY_Cheak rq;
@@ -630,6 +567,7 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
         Mediator->net->Send((char*)&rq,rq.size);
 
     Sleep(500);
+        On_Deal_SendVsMsg("No",rs.username1,"a");
     gameList->show();
 
     }else{
@@ -649,12 +587,22 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
     gameList->draw23( gameList->cless->change);
 
     }else if(rs.count ==1){
+        QMessageBox msgBox;
+        msgBox.setText("提示");
+        msgBox.setInformativeText("是否先和人机对战（后续有玩家可以中途加入）");
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        int ret = msgBox.exec();
+        if(ret==QMessageBox::Ok){
         gameList->AiMode =true;
         gameList->first =true;
         gameList->AIandPlayDraw(1);
         QMessageBox::about(gameList,"提示","你是白棋");
         cout<<"Aimode"<<endl;
         gameList->show();
+        }else{
+            return;
+        }
     }
 
 }
@@ -710,6 +658,7 @@ void ckernel::Del_PlayCheak(long ISendIp, char* buf, int nLen){
 
             gameList->draw23(gameList->cless->change);
             //告诉对面可以
+
              emit gameList->on_sendask_Cheak("yes");
             cout<<33333333<<endl;
         }
@@ -747,22 +696,13 @@ void ckernel::Del_PlayCheak(long ISendIp, char* buf, int nLen){
         msgBox.setInformativeText("对端同意");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
+
+        On_Deal_SendVsMsg("No",gameList->againestName,"a");
     }
 }
 
 void ckernel::GetUserAndHouse(){
-    //刷新房间数量的函数
-//    for(int i=m_Finfo.size()-1;i>=0;i--){
-//        if(m_Finfo[i]!=nullptr)
-//        delete m_Finfo[i];
 
-//        m_Finfo[i] =nullptr;
-//        m_Finfo[i]->close();
-//        m_Finfo.pop_back();
-//    }
-
-
-//下面是检测有没有新的房间
     STRU_HOUSE_flush rs;
     strcpy(rs.username,m_wnd->userName);
     Mediator->net->Send((char*)&rs,rs.size);
@@ -821,6 +761,9 @@ void ckernel::Del_Failed(long ISendIp, char* buf, int nLen){
     STRU_PLAY_Cheak rs = *(STRU_PLAY_Cheak*)buf;
     if(strcmp(rs.quest,"fail")==0){
         QMessageBox::about(gameList,"提示","对方认输");
+        if(gameList->cless->change==1){
+            emit gameList->on_EndVsgame(gameList->againestName,gameList->againestName,"b");
+        }
         QMessageBox msgBox;
         msgBox.setText("提示");
         msgBox.setInformativeText("是否退出?");
@@ -918,6 +861,17 @@ void ckernel::Del_HostAsk(long ISendIp, char* buf, int nLen){
     }
 }
 
+void ckernel::Del_Vshistory(long ISendIp, char* buf, int nLen){
+    STRU_VsHistory rs=*(STRU_VsHistory*) buf;
+    QMessageBox msgBox;
+    msgBox.setText("提示");
+    msgBox.setInformativeText(QString("总场数【%1】，胜利场数【%2】").arg(rs.SumVs).arg(rs.win));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+
+    int ret = msgBox.exec();
+}
+
 //发出数据------------------------------------------------------------------------------------------------------------------------
 unsigned int* MD5(const char* mStr); //MD5加密函数，并执行数据填充
 void  ckernel::On_Deal_Login(){
@@ -953,6 +907,7 @@ void  ckernel::On_Deal_Login(){
 
 }
 void  ckernel::On_Deal_Register(){
+    //正则分析是否为空
     STRU_REGISTER SR;
    SR.nType =_def_PROTOCOL_register_;
    if(strcmp(m_wnd->password,"")==0&&strcmp(m_wnd->userName,"")==0){
@@ -1096,6 +1051,8 @@ void  ckernel::On_Deal_PLAY(string Housename){
     rq.count =0;
     cout<<"HouseNmae "<<Housename<<" userName "<<rq.username<<endl;
     Mediator->net->Send((char*)&rq,rq.size);
+
+    On_Deal_SendVsMsg("No",gameList->againestName,"a");
 }
 void ckernel::On_Deal_Plying(int x,int y){
     STRU_PLAY_Process rq;
@@ -1109,6 +1066,9 @@ void ckernel::On_Deal_Plying(int x,int y){
     Mediator->net->Send((char*)&rq,rq.size);
 }
 void ckernel::On_Deal_PlayCheak(string s){
+    if(gameList->cless->change==1){
+        emit gameList->on_EndVsgame("MyName",gameList->againestName,"b");
+    }
     STRU_PLAY_Cheak rq;
     strcpy(rq.quest,s.c_str());
     strcpy(rq.username,m_wnd->userName);
@@ -1153,6 +1113,8 @@ void ckernel::On_Deal_FriendVS(string s){
     gameList->againestName = rq.hostname;
     gameList->SetName(gameList->againestName);
     Mediator->net->Send((char*)&rq,rq.size);
+    //发送对局记录
+
 }
 
 void ckernel::On_Deal_HouseFlush(string s){
@@ -1189,4 +1151,33 @@ void ckernel::On_Deal_DelFrriend(string friendName){
     Mediator->net->Send((char*)&rq,rq.size);
     deleteItem(friendName);
      //QMessageBox::about(gameList,"提示","本次登陆被删除好友还在列表上");
+}
+
+void ckernel::On_Deal_SendVsMsg(string winner,string againestname,string Do){
+    cout<<"============================"<<endl;
+    STRU_VsAnswer rq;
+    if(winner == "MyName"){
+        strcpy(rq.Winname,m_wnd->userName);
+    }else{
+        strcpy(rq.Winname,winner.c_str());
+    }
+    if(againestname.size()==0)return ;
+
+    if(againestname =="Myname"){
+        strcpy(rq.friendname,m_wnd->userName);
+        strcpy(rq.username,gameList->againestName.c_str());
+    }else{
+            strcpy(rq.friendname,againestname.c_str());
+            strcpy(rq.username,m_wnd->userName);
+    }
+
+    rq.shouldDo = Do[0];
+    cout<<"my name is:"<<rq.username<<"againest with:"<<rq.friendname<<"winner is:"<<rq.Winname<<endl;
+     Mediator->net->Send((char*)&rq,rq.size);
+}
+void ckernel::On_Deal_GetVsHistory(){
+    STRU_VsHistory rq;
+    strcpy(rq.username,m_wnd->userName);
+    //数据库负责汇总表记录  返回给用户
+    Mediator->net->Send((char*)&rq,rq.size);
 }

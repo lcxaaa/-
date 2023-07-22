@@ -1,6 +1,5 @@
 //#include "stdafx.h"
 #include "../include/CMySql.h"
-unsigned int timeout = 7;
 
 CMySql::CMySql(void)
 {
@@ -8,8 +7,10 @@ CMySql::CMySql(void)
     如果你传入的参数是NULL指针，它将自动为你分配一个MYSQL对象，
     如果这个MYSQL对象是它自动分配的，那么在调用mysql_close的时候，会释放这个对象*/
     m_sock = new MYSQL;
+	char value = 1;
     mysql_init(m_sock);  
     mysql_set_character_set(m_sock, "gb2312"); //gb2312 中华人民共和国简体字标准
+	mysql_options(m_sock, MYSQL_OPT_RECONNECT,&value);
 }
 
 
@@ -28,11 +29,6 @@ void CMySql::DisConnect()
 
 bool CMySql::ConnectMySql(char *host, char *user, char *pass, char *db, short nport)
 {
-	int ret = mysql_options(m_sock,MYSQL_OPT_CONNECT_TIMEOUT,(const char*)&timeout);//设置超时选项
-	     if(ret){
-			printf("Options Set ERRO!\n");
-			return false;
-		}
 
 		 
 	if(!mysql_real_connect(m_sock,host,user,pass,db,0,NULL,0)) return false;
@@ -65,8 +61,10 @@ bool CMySql::ConnectMySql(char *host, char *user, char *pass, char *db, short np
 bool CMySql::SelectMySql(char* szSql, int nColumn, list<string>& lstStr)
 {
 
-	mysql_ping(m_sock); 
+	if(mysql_ping(m_sock)){
+		//mysql_close(m_sock);
 
+	} 
     //mysql_query() 函数用于向 MySQL 发送并执行 SQL 语句
 	if(mysql_query(m_sock, szSql)) {
 		std::cout <<"query "<< mysql_error(m_sock) << std::endl;;

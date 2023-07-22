@@ -15,6 +15,10 @@ Ground::Ground(QWidget *parent) :
 
 Ground::~Ground()
 {
+    if(layout){
+        delete layout;
+        layout =nullptr;
+    }
     delete ui;
 }
 
@@ -64,12 +68,14 @@ void Ground::on_pushButton_clicked()
 
 void Ground::on_AiGamePb_clicked()
 {
+    QMessageBox::about(this,"提示","和AI对战不记入战绩");
     emit on_Ai_Game();
 }
 
 
+
 void Ground::on_pushButton_2_clicked()
 {
-    emit on_ShowSetting();
+    emit on_GetVshistory();
 }
 

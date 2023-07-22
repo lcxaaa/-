@@ -25,7 +25,7 @@ using namespace std;
 
 #define _DEF_NAME_SIZE_ (10) //名字长度
 #define _DEF_CONTENT_SIZE (900)//聊天内容长度
-#define _DEF_PROTOCOL_COUNT (27)//函数偏移
+#define _DEF_PROTOCOL_COUNT (29)//函数偏移
 #define _DEF_PASSWORD_SIZE (40)//密码
 #define _DEF_HOUSE_ID_SIZE (10) //房间名字长度
 #define _DEF_PROTOCOL_BASE_ (900) //协议头开始
@@ -109,6 +109,12 @@ using namespace std;
 #define _def_PROTOCOL_DelFriend (_DEF_PROTOCOL_BASE_ + 25)
 
 #define _def_PROTOCOL_WaitOk (_DEF_PROTOCOL_BASE_ + 26)
+
+//对局结果
+#define _def_PROTOCOL_VSanwser (_DEF_PROTOCOL_BASE_ + 27)
+//对局记录
+#define _def_PROTOCOL_History (_DEF_PROTOCOL_BASE_ + 28)
+
 //登陆协议包
 struct STRU_LOGIN {
 	STRU_LOGIN() :nType(_DEF_PROTOCOL_Login_),size(sizeof(STRU_LOGIN)) {
@@ -436,3 +442,30 @@ struct STRU_WaitOk {
 	char friendname[_DEF_NAME_SIZE_];//房主名字
 };
 
+struct STRU_VsAnswer {
+	STRU_VsAnswer() :nType(_def_PROTOCOL_VSanwser) ,size(sizeof(STRU_VsAnswer)){
+		memset(username, 0, sizeof(username));
+		memset(friendname, 0, sizeof(friendname));
+		memset(Winname, 0, sizeof(Winname));
+		shouldDo = 'a';//为a表示开始
+	}
+	int nType;
+	int size;
+	char shouldDo;
+	char Winname[_DEF_NAME_SIZE_];//赢的人的名字
+	char username[_DEF_NAME_SIZE_];//用户名字
+	char friendname[_DEF_NAME_SIZE_];//对手
+};
+
+struct STRU_VsHistory {
+	STRU_VsHistory() :nType(_def_PROTOCOL_History) ,size(sizeof(STRU_VsHistory)){
+		memset(username, 0, sizeof(username));
+		win =0,SumVs=0;
+	}
+	//s=时间数据库使用curadte()得到
+	int nType;
+	int size;
+	char username[_DEF_NAME_SIZE_];//用户名字
+	int win;
+	int SumVs;
+};

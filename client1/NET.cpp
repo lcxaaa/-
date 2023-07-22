@@ -49,7 +49,6 @@ bool NET::Net_Init(int PORT,const char* IP)
 	saddr.sin_addr.S_un.S_addr = inet_addr(IP);
 }
 
-
 bool NET::Net_Connect()
 {
 	if (connect(serversock, (sockaddr*)&saddr, sizeof(saddr))!=0) {

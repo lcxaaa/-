@@ -21,7 +21,6 @@ int main()
    //6*2 -生产者 main keepalive  manager 后为8
  
 	Thread_Pool_Create(8, 4);
-	thread_pool_destroy();
 	
 	free(kernel);
 	kernel =nullptr;

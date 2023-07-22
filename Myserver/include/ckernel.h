@@ -12,6 +12,7 @@ public:
 	ckernel();
 	~ckernel();
 	PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];
+	void PFUNinit();
 	void Deal(SOCKET ISendIp,int t,char* buf,int len);
 	void Del_Online(SOCKET ISendIp,char* buf, int len);
 	void Del_Offline(SOCKET ISendIp,char* buf, int len);
@@ -37,7 +38,9 @@ public:
 	void Deal_HostAsk(SOCKET ISendIp, char* buf, int len);
 	void DeleteFriend(SOCKET ISendIp, char* buf, int len);
 	void Del_WaitOk(SOCKET ISendIp, char* buf, int len);
-	public:
+	void Del_vsHistory(SOCKET ISendIp, char* buf, int len);
+	void Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len);
+public:
 	map<string, SOCKET> m_mapUseridToSocket;
 	CMySql sql;
 };

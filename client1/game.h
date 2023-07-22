@@ -46,11 +46,15 @@ signals:
     void  on_sendCless_msg(int x,int y);
     void  on_sendask_Cheak(string s);
     void  on_sendFaile();
+    void  on_sendGameChatMsg();
+    void  on_EndVsgame(string winner,string againestName,string Do);
 public slots:
     void on_Deal_AIgame();
 private slots:
     void on_pushButton_2_clicked();
     void on_QuitPB_clicked();
+
+    void on_GameChat_clicked();
 
 private:
     Ui::Game *ui;

@@ -10,8 +10,8 @@ extern int serverfd;
 
 
 int FindAlive(pthread_t tid){
-	int res = pthread_kill(tid,0);
-	if(res==ESRCH){
+	pthread_kill(tid,0);
+	if(errno==ESRCH){
 		return 0;	
 	}
 	return 1;

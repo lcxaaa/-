@@ -14,8 +14,10 @@ void InitContainer(){
 
 int GetContainer(){
 	if(head<rear){
+
 		int ans = container[head++%80];
-		container[head-1%80] =-1;
+		container[(head-1)%80] =-1;
+		cout<<"ans is"<<ans<<endl;
 		return ans;
 	}else{
 		return -1;	
@@ -24,6 +26,7 @@ int GetContainer(){
 
 void AddContainer(int a){
 	if(container[rear%80]==-1){
+		cout<<"add cur"<<endl;
 	container[rear++%80] = a;
 	}
 }

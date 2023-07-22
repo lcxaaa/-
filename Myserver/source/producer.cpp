@@ -29,6 +29,7 @@ void* producerWork(void*val){
 
 			}else{
 				printf("having events\n");
+				cout<<"clientfd is :"<<epollevent[i].data.fd<<endl;
 				AddContainer(epollevent[i].data.fd);
 				pool->cur++;
 			}
@@ -39,7 +40,7 @@ void* producerWork(void*val){
 		printf("cur=%d\n",pool->cur);
 		printf("=================\n");
 
-		if(pool->cur!=50){
+		if(pool->cur>0){
 			printf("producer wait\n");
 			pthread_cond_signal(&MA);
 			pthread_cond_wait(&PR,&mutex);

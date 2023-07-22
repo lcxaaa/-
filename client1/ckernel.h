@@ -25,7 +25,7 @@ public:
      ~ckernel();
     explicit ckernel(QObject *parent = nullptr);
     PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];
-
+        void PFUNinit();
         void Del_Online(long ISendIp, char* buf, int nLen);
         void Del_Playing(long ISendIp, char* buf, int nLen);
         void Del_Offline(long ISendIp, char* buf, int nLen);
@@ -52,7 +52,9 @@ public:
         void Del_HouseNumber(long ISendIp, char* buf, int nLen);
         void Del_HostAsk(long ISendIp, char* buf, int nLen);
         void Del_WaitOk(long ISendIp, char* buf, int nLen);
+        void Del_Vshistory(long ISendIp, char* buf, int nLen);
         string HouseName;
+        bool AbleInit =true;
         void deleteItem(string s);
     private:
         NetMediator* Mediator;
@@ -60,7 +62,6 @@ public:
         Ground* m_Ground;
         addfriend* m_add;
         list<friendinfo*> m_Finfo;
-
         FriendGround* m_fGround;
         housename* m_houname;
         list<House*>m_house;
@@ -73,7 +74,6 @@ public slots:
     void On_Deal_ONLINE();
     void On_Deal_ADD();
     void On_Deal_OFFLINE();
-
     void On_Deal_CHAR(string friends,TalkInfo* m);
     void On_Deal_INFO();
     void On_Deal_JOIN(string housename);
@@ -90,6 +90,8 @@ public slots:
     void On_Deal_HouseFlush(string s);
     void On_Deal_DelFrriend(string friendName);
     void On_Deal_CloseNow();
+    void On_Deal_SendVsMsg(string winner,string againestName,string DO);
+    void On_Deal_GetVsHistory();
 };
 
 #endif // CKERNEL_H

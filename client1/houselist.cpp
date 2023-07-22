@@ -82,6 +82,10 @@ void houseList::closeEvent(QCloseEvent *e){
     }
 }
 
+void houseList::startPb(){
+    ui->pushButton->show();
+}
+
 void houseList::Unstart(){
     ui->pushButton->hide();
 }

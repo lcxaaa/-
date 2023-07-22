@@ -5,7 +5,7 @@
 #include"./MyDefine.h"
 #include"./house.h"
 #include<QVBoxLayout>
-
+#include<QScrollArea>
 namespace Ui {
 class Ground;
 }
@@ -22,6 +22,7 @@ public:
     void AddItem(House* m_house);
     QVBoxLayout*layout;
     void DelItem(House* m_house);
+     QScrollArea *scrollarea;
 
     bool firstOpen;
 private slots:
@@ -43,7 +44,7 @@ signals:
         void on_create_house();
         void on_Reflush_house();
         void on_Ai_Game();
-        void on_ShowSetting();
+        void on_GetVshistory();
 private:
     Ui::Ground *ui;
 };

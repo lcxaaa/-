@@ -26,6 +26,7 @@ public:
     void closeEvent(QCloseEvent *e);
     void clearAll();
     void Unstart();
+    void startPb();
     string HosueName;
 signals:
 void on_flush_list(string name);
