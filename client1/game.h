@@ -46,16 +46,26 @@ public:
     //AI的棋子的绘制
     void AIandPlayDraw(int a);
 signals:
+<<<<<<< HEAD
     void  on_sendCless_msg(int x,int y);//棋子位置消息信号
     void  on_sendask_Cheak(string s);//结束后再来一次的信号
     void  on_sendFaile();//失败的信号
     void  on_sendGameChatMsg();
     void  on_EndVsgame(string winner,string againestName,string Do);//结束对局信号
+=======
+    void  on_sendCless_msg(int x,int y);
+    void  on_sendask_Cheak(string s);
+    void  on_sendFaile();
+    void  on_sendGameChatMsg();
+    void  on_EndVsgame(string winner,string againestName,string Do);
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 public slots:
     void on_Deal_AIgame();
 private slots:
     void on_pushButton_2_clicked();//认输槽函数
     void on_QuitPB_clicked();//退出按键槽函数
+
+    void on_GameChat_clicked();
 
 private:
     Ui::Game *ui;

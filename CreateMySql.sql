@@ -33,6 +33,10 @@ create index houseIndex on t_house(username);
   idA varchar(20) unique not null,
   idB varchar(20) unique not null ,
   win varchar(20) unique not null ,
+<<<<<<< HEAD
   Time datetime not null,
   EndTime datetime not null
+=======
+  Time datetime not null
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
   );

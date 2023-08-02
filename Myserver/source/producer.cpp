@@ -42,8 +42,11 @@ void* producerWork(void*val){
 		printf("=================\n");
 
 		if(pool->cur>0){
+<<<<<<< HEAD
 			//当连接多的时候，可能导致事件的丢失，后期优化
 			//线程池任务大于0,让管理者唤醒任务线程
+=======
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 			printf("producer wait\n");
 			pthread_cond_signal(&MA);
 			pthread_cond_wait(&PR,&mutex);

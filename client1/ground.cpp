@@ -25,10 +25,13 @@ Ground::~Ground()
         delete layout;
         layout =nullptr;
     }
+<<<<<<< HEAD
     if(widget){
         delete widget;
         widget =nullptr;
     }
+=======
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     delete ui;
 }
 

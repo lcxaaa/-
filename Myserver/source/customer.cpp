@@ -33,12 +33,18 @@ void* customerWork(void*val){
 				printf("customer error\n");
 			}
 			char buf[1024];
+<<<<<<< HEAD
 			//接受信息
+=======
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 			int size = recv(clientfd,buf,2048,0);
 			int temp=0,ans=0;
 			cout<<"size == "<<size<<endl;
 			if(size ==0){
+<<<<<<< HEAD
 				//size为0表示对端断开连接
+=======
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 				epoll_ctl(epfd,EPOLL_CTL_DEL,clientfd,NULL);
 				pool->busy++;
 				continue;

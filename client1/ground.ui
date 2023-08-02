@@ -66,6 +66,19 @@
    </property>
   </widget>
   <widget class="QPushButton" name="AiGamePb">
+<<<<<<< HEAD
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>200</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>人机对战</string>
+   </property>
+=======
    <property name="geometry">
     <rect>
      <x>520</x>
@@ -78,6 +91,41 @@
     <string>人机对战</string>
    </property>
   </widget>
+  <widget class="QScrollArea" name="scrollArea">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>501</width>
+     <height>531</height>
+    </rect>
+   </property>
+   <property name="widgetResizable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="scrollAreaWidgetContents">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>499</width>
+      <height>529</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>-1</x>
+       <y>-1</y>
+       <width>501</width>
+       <height>521</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout"/>
+    </widget>
+   </widget>
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
+  </widget>
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
@@ -89,6 +137,7 @@
    </property>
    <property name="text">
     <string>战绩</string>
+<<<<<<< HEAD
    </property>
   </widget>
   <widget class="QScrollArea" name="scrollArea">
@@ -102,6 +151,8 @@
    </property>
    <property name="widgetResizable">
     <bool>true</bool>
+=======
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
    </property>
    <widget class="QWidget" name="scrollAreaWidgetContents">
     <property name="geometry">
@@ -133,8 +184,13 @@
   <zorder>pushButton_3</zorder>
   <zorder>friendinfo</zorder>
   <zorder>AiGamePb</zorder>
+<<<<<<< HEAD
   <zorder>pushButton_2</zorder>
   <zorder>scrollArea</zorder>
+=======
+  <zorder>scrollArea</zorder>
+  <zorder>pushButton_2</zorder>
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
  </widget>
  <resources/>
  <connections/>

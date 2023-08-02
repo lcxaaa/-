@@ -15,7 +15,11 @@ void InitContainer(){
 
 int GetContainer(){
 	if(head<rear){
+<<<<<<< HEAD
 		//如果还有任务，得到任务，得到后赋值为-1
+=======
+
+>>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		int ans = container[head++%80];
 		container[(head-1)%80] =-1;
 		cout<<"ans is"<<ans<<endl;
