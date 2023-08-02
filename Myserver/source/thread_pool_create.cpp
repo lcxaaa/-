@@ -94,11 +94,7 @@ void *aliveTest(void* val){
 						//处理下线
 						char sqlBuf[1024] = "";
 						list<string> listRes;
-<<<<<<< HEAD
 						sprintf(sqlBuf, "update t_user set status =0 where userid ='%s';", m->first.c_str());
-=======
-						sprintf(sqlBuf, "update t_user set status =0 where userid ='%s';", rq.username);
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 						if (!kernel->sql.UpdateMySql(sqlBuf)) { 
 							cout << "sqlBuf:" << sqlBuf << endl; 
 							cout << "userName 更新数据库错误" << endl;

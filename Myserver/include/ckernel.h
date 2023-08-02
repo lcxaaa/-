@@ -11,13 +11,8 @@ class ckernel {
 public:
 	ckernel();
 	~ckernel();
-<<<<<<< HEAD
 	PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];//类函数指针 数组
 	void PFUNinit();//函数初始化
-=======
-	PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];
-	void PFUNinit();
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	void Deal(SOCKET ISendIp,int t,char* buf,int len);
 	void Del_Online(SOCKET ISendIp,char* buf, int len);
 	void Del_Offline(SOCKET ISendIp,char* buf, int len);
@@ -46,10 +41,7 @@ public:
 	void Del_vsHistory(SOCKET ISendIp, char* buf, int len);
 	void Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len);
 public:
-<<<<<<< HEAD
 	//用户id和套接字的对应关系
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	map<string, SOCKET> m_mapUseridToSocket;
 	CMySql sql;
 };

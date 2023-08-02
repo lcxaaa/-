@@ -24,13 +24,8 @@ class ckernel : public QObject
 public:
      ~ckernel();
     explicit ckernel(QObject *parent = nullptr);
-<<<<<<< HEAD
     PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];//类函数指针，利用类函数指针 直到type后就可以一个语句执行多个函数
         void PFUNinit();//类函数指针初始化
-=======
-    PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];
-        void PFUNinit();
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
         void Del_Online(long ISendIp, char* buf, int nLen);
         void Del_Playing(long ISendIp, char* buf, int nLen);
         void Del_Offline(long ISendIp, char* buf, int nLen);
@@ -58,15 +53,9 @@ public:
         void Del_HostAsk(long ISendIp, char* buf, int nLen);
         void Del_WaitOk(long ISendIp, char* buf, int nLen);
         void Del_Vshistory(long ISendIp, char* buf, int nLen);
-<<<<<<< HEAD
         string HouseName;//所在房间的名字
 
         void deleteItem(string s);//删除用户控件
-=======
-        string HouseName;
-        bool AbleInit =true;
-        void deleteItem(string s);
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     private:
 
         NetMediator* Mediator;

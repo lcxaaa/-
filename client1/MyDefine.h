@@ -415,11 +415,7 @@ struct STRU_WaitOk {
     char username[_DEF_NAME_SIZE_];//用户名字
     char friendname[_DEF_NAME_SIZE_];//房主名字
 };
-<<<<<<< HEAD
 //好友对战请求的报文
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 struct STRU_VsAnswer{
      STRU_VsAnswer() :nType(_def_PROTOCOL_VSanwser) ,size(sizeof(STRU_VsAnswer)){
          memset(username, 0, sizeof(username));
@@ -435,11 +431,7 @@ struct STRU_VsAnswer{
     char friendname[_DEF_NAME_SIZE_];//对手
 };
 
-<<<<<<< HEAD
 //查询战绩的报文
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 struct STRU_VsHistory {
     STRU_VsHistory() :nType(_def_PROTOCOL_History) ,size(sizeof(STRU_VsHistory)){
         memset(username, 0, sizeof(username));

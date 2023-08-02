@@ -28,11 +28,7 @@ void thread_pool_destroy(){
 	printf("destory P\n");
 	pthread_join(pool->Pt,NULL);
 	pthread_join(pool->Al,NULL);
-<<<<<<< HEAD
 	//释放资源
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	free(pool->ct);
 	free(pool);
 	pthread_mutex_destroy(&mapmutex);

@@ -65,13 +65,9 @@ bool CMySql::SelectMySql(char* szSql, int nColumn, list<string>& lstStr)
 
 	if(mysql_ping(m_sock)){
 		//mysql_close(m_sock);
-<<<<<<< HEAD
 		//查看是否还和服务器进行连接
 		//ping 会重新连接到服务器
 		//即 使用mysql_ping能够自动重连数据库
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	} 
     //mysql_query() 函数用于向 MySQL 发送并执行 SQL 语句
 	if(mysql_query(m_sock, szSql)) {

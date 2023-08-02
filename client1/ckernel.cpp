@@ -8,11 +8,7 @@ extern     ckernel* kernel;
 int OfflineAble =1;
 ckernel::ckernel(QObject *parent) : QObject(parent)
 {
-<<<<<<< HEAD
     //创建对象，负责成员里面的指针
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     Mediator = new NetMediator;
     m_wnd = new MainWindow;
     m_Ground = new Ground;
@@ -57,13 +53,9 @@ ckernel::ckernel(QObject *parent) : QObject(parent)
      connect(m_wnd,SIGNAL(on_closeN()),this,SLOT(On_Deal_CloseNow()));
      connect(gameList,SIGNAL(on_EndVsgame(string,string,string)),this,SLOT(On_Deal_SendVsMsg(string,string,string)));
      connect(m_Ground,SIGNAL(on_GetVshistory()),this,SLOT(On_Deal_GetVsHistory()));
-<<<<<<< HEAD
      //绑定类函数指针和类中的功能函数
      PFUNinit();
      //网络初始化
-=======
-     PFUNinit();
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
        Mediator->Net_Init(port,ip);
        Mediator->Net_Connect();
        //登陆界面
@@ -198,61 +190,6 @@ void ckernel::PFUNinit(){
 
 }
 
-<<<<<<< HEAD
-=======
-void ckernel::PFUNinit(){
-    m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Login;
-    m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Online;
-    m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Offline;
-    m_netProtocolMap[_def_PROTOCOL_register_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Register;
-    m_netProtocolMap[_def_PROTOCOL_friend_INFO_RS - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Friend_Info;
-    m_netProtocolMap[_def_PROTOCOL_add_friend_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Add_Friend;
-    m_netProtocolMap[_def_PROTOCOL_chat_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Chat;
-    m_netProtocolMap[_def_PROTOCOL_Join_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Join;
-    m_netProtocolMap[_def_PROTOCOL_Create_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Create;
-    m_netProtocolMap[_def_PROTOCOL_Leave_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Leave;
-    m_netProtocolMap[_def_PROTOCOL_Play_ - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Play;
-    m_netProtocolMap[_def_PROTOCOL_add_friend_rs1 - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Friend;
-    m_netProtocolMap[_def_PROTOCOL_add_friend_rs2 - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_fin_friend;
-    m_netProtocolMap[_def_PROTOCOL_Create_Rs - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_Create_rs;
-    m_netProtocolMap[_def_PROTOCOL_House_List - _DEF_PROTOCOL_BASE_] =
-        &ckernel::Del_House_Info;
-      m_netProtocolMap[_def_PROTOCOL_reflush - _DEF_PROTOCOL_BASE_] =&ckernel::Del_House_Reflush;
-       m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Process - _DEF_PROTOCOL_BASE_] =&ckernel::Del_Playing;
-       m_netProtocolMap[_def_PROTOCOL_STRU_PLAY_Cheak - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_PlayCheak;
-       m_netProtocolMap[_def_PROTOCOL_STRU_MyFailed - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_Failed;
-       m_netProtocolMap[_def_PROTOCOL_AliveTest - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_AliveTest;
-       m_netProtocolMap[_def_PROTOCOL_DeleteHouseReflush - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_DeleteReflush;
-       m_netProtocolMap[_def_PROTOCOL_HouseNumberReflush - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_HouseNumber;
-       m_netProtocolMap[_def_PROTOCOL_AskHostJoin - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_HostAsk;
-       m_netProtocolMap[_def_PROTOCOL_WaitOk - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_WaitOk;
-       m_netProtocolMap[_def_PROTOCOL_History - _DEF_PROTOCOL_BASE_] =
-           &ckernel::Del_Vshistory;
-
-}
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 
 void ckernel::Deal(long ISendIp, char* buf, int nLen)
 {
@@ -261,12 +198,8 @@ void ckernel::Deal(long ISendIp, char* buf, int nLen)
     int type = *(int*)buf;//得到包内类型
     cout<<"type:  "<<type<<"size: "<<nLen<<endl;
     if(type>_DEF_PROTOCOL_BASE_&&type<_DEF_PROTOCOL_BASE_+_DEF_PROTOCOL_COUNT&&m_netProtocolMap[type-_DEF_PROTOCOL_BASE_]!=nullptr){
-<<<<<<< HEAD
         //if里面为类型发范围判断和是否超过绑定
         (this->*m_netProtocolMap[type-_DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);//执行函数
-=======
-        (this->*m_netProtocolMap[type-_DEF_PROTOCOL_BASE_])(ISendIp,buf, nLen);
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     }
 
 }
@@ -550,7 +483,6 @@ void ckernel::Del_Create_rs(long ISendIp, char* buf, int nLen){
       m_houseL->show();
       m_houseL->AddItem(rs.hostName);
     m_houseL->startPb();
-<<<<<<< HEAD
 
      bool tru =false;//表示是否存在同名控件
     for(auto ite = m_house.begin();ite!=m_house.end();ite++){
@@ -560,8 +492,6 @@ void ckernel::Del_Create_rs(long ISendIp, char* buf, int nLen){
     }
     if(!tru){
         //添加玩家 控件显示
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
       m_house.push_back(new House);
       auto ite = m_house.rbegin();
       (*ite)->SetHouseName(m_houseL->HosueName);
@@ -630,10 +560,7 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
               strcpy(rq.username1,rs.username);
                 //发送同意报文
               Mediator->net->Send((char*)&rq,rq.size);
-<<<<<<< HEAD
               //界面初始化
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
               gameList->show();
               gameList->Pix=QPixmap(600, 600);
               gameList->Pix.fill(Qt::white);
@@ -695,13 +622,8 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
         strcpy(rq.friendname,rs.username1);
         Mediator->net->Send((char*)&rq,rq.size);//让黑方也确认一下
 
-<<<<<<< HEAD
     Sleep(500);//等待网络发送报文的过程
         On_Deal_SendVsMsg("No",rs.username1,"a");//记录开始的对局
-=======
-    Sleep(500);
-        On_Deal_SendVsMsg("No",rs.username1,"a");
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     gameList->show();
 
     }else{
@@ -723,20 +645,14 @@ void ckernel::Del_Play(long ISendIp, char* buf, int nLen)
     gameList->draw23( gameList->cless->change);
 
     }else if(rs.count ==1){
-<<<<<<< HEAD
         //房间只有一个人
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
         QMessageBox msgBox;
         msgBox.setText("提示");
         msgBox.setInformativeText("是否先和人机对战（后续有玩家可以中途加入）");
         msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Ok);
         int ret = msgBox.exec();
-<<<<<<< HEAD
         //是否进入人机模式
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
         if(ret==QMessageBox::Ok){
         gameList->AiMode =true;
         gameList->first =true;
@@ -853,11 +769,7 @@ void ckernel::Del_PlayCheak(long ISendIp, char* buf, int nLen){
 }
 
 void ckernel::GetUserAndHouse(){
-<<<<<<< HEAD
     //刷新房间控件
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     STRU_HOUSE_flush rs;
     strcpy(rs.username,m_wnd->userName);
     Mediator->net->Send((char*)&rs,rs.size);
@@ -919,10 +831,7 @@ void ckernel::Del_Failed(long ISendIp, char* buf, int nLen){
     if(strcmp(rs.quest,"fail")==0){
         QMessageBox::about(gameList,"提示","对方认输");
         if(gameList->cless->change==1){
-<<<<<<< HEAD
             //房主发送结束对局的的报文  如果房主认输，失败那里已经发送过一次了
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
             emit gameList->on_EndVsgame(gameList->againestName,gameList->againestName,"b");
         }
         QMessageBox msgBox;
@@ -1031,20 +940,13 @@ void ckernel::Del_HostAsk(long ISendIp, char* buf, int nLen){
 }
 
 void ckernel::Del_Vshistory(long ISendIp, char* buf, int nLen){
-<<<<<<< HEAD
     //得到对战的历史记录，此时是接收到服务器的数据
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     STRU_VsHistory rs=*(STRU_VsHistory*) buf;
     QMessageBox msgBox;
     msgBox.setText("提示");
     msgBox.setInformativeText(QString("总场数【%1】，胜利场数【%2】").arg(rs.SumVs).arg(rs.win));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Ok);
-<<<<<<< HEAD
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     int ret = msgBox.exec();
 }
 
@@ -1089,11 +991,7 @@ void  ckernel::On_Deal_Login(){
 
 }
 void  ckernel::On_Deal_Register(){
-<<<<<<< HEAD
     //发送注册报文
-=======
-    //正则分析是否为空
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     STRU_REGISTER SR;
    SR.nType =_def_PROTOCOL_register_;
    //判断密码和名字
@@ -1251,11 +1149,7 @@ void  ckernel::On_Deal_PLAY(string Housename){
     rq.count =0;
     cout<<"HouseNmae "<<Housename<<" userName "<<rq.username<<endl;
     Mediator->net->Send((char*)&rq,rq.size);
-<<<<<<< HEAD
     //表示游戏开始，发送游戏记录的报文
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     On_Deal_SendVsMsg("No",gameList->againestName,"a");
 }
 void ckernel::On_Deal_Plying(int x,int y){
@@ -1271,15 +1165,10 @@ void ckernel::On_Deal_Plying(int x,int y){
     Mediator->net->Send((char*)&rq,rq.size);
 }
 void ckernel::On_Deal_PlayCheak(string s){
-<<<<<<< HEAD
     //游戏结束后再来一把的报文发送
     if(gameList->cless->change==1){
         emit gameList->on_EndVsgame("MyName",gameList->againestName,"b");
         //此时游戏结束，发送记录结束的报文
-=======
-    if(gameList->cless->change==1){
-        emit gameList->on_EndVsgame("MyName",gameList->againestName,"b");
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     }
     STRU_PLAY_Cheak rq;
     strcpy(rq.quest,s.c_str());
@@ -1328,11 +1217,7 @@ void ckernel::On_Deal_FriendVS(string s){
     gameList->SetName(gameList->againestName);
     Mediator->net->Send((char*)&rq,rq.size);
     //发送对局记录
-<<<<<<< HEAD
     //好友对战不算在战绩，于是不加入
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 }
 
 void ckernel::On_Deal_HouseFlush(string s){
@@ -1377,13 +1262,9 @@ void ckernel::On_Deal_DelFrriend(string friendName){
 
 void ckernel::On_Deal_SendVsMsg(string winner,string againestname,string Do){
     cout<<"============================"<<endl;
-<<<<<<< HEAD
     //发送对局记录 D为a为开始  为b为结束
     STRU_VsAnswer rq;
     //报文名字处理
-=======
-    STRU_VsAnswer rq;
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     if(winner == "MyName"){
         strcpy(rq.Winname,m_wnd->userName);
     }else{
@@ -1404,10 +1285,7 @@ void ckernel::On_Deal_SendVsMsg(string winner,string againestname,string Do){
      Mediator->net->Send((char*)&rq,rq.size);
 }
 void ckernel::On_Deal_GetVsHistory(){
-<<<<<<< HEAD
     //查询对局记录
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     STRU_VsHistory rq;
     strcpy(rq.username,m_wnd->userName);
     //数据库负责汇总表记录  返回给用户

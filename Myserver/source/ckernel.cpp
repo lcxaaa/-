@@ -1,15 +1,9 @@
 #include"../include/ckernel.h"
 
 using namespace std;
-<<<<<<< HEAD
 extern int serverfd;//服务器套接字
 extern map<SOCKET,int> m_AliveLoseCount;//心跳报文的丢失计数
 extern pthread_mutex_t mapmutex;//保护map的锁，map为套接字和用户对
-=======
-extern int serverfd;
-extern map<SOCKET,int> m_AliveLoseCount;
-extern pthread_mutex_t mapmutex;
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 
 ckernel::ckernel()
 {
@@ -29,13 +23,8 @@ ckernel::ckernel()
 		cout << "userName 更新数据库错误" << endl;
 		return;
 	}
-<<<<<<< HEAD
 	PFUNinit();//类函数和类的函数指针初始化
 	//Epoll 头文件使用了网络初始化 这里不用
-=======
-	PFUNinit();
-	//Epoll 头文件使用了网络初始化
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 }
 
 ckernel::~ckernel()
@@ -51,10 +40,7 @@ ckernel::~ckernel()
 }
 
 void ckernel::PFUNinit(){
-<<<<<<< HEAD
 	//绑定 函数指针和目标函数
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	m_netProtocolMap[_DEF_PROTOCOL_Login_ - _DEF_PROTOCOL_BASE_]=&ckernel::Del_Login;
 	m_netProtocolMap[_DEF_PROTOCOL_ONLINE_ - _DEF_PROTOCOL_BASE_] = &ckernel::Del_Online;
 	m_netProtocolMap[_DEF_PROTOCOL_OFFLINE_ - _DEF_PROTOCOL_BASE_] = &ckernel::Del_Offline;
@@ -96,11 +82,7 @@ void ckernel::Deal(SOCKET ISendIp,int t,char*buf,int len)
 void  ckernel::Del_Login(SOCKET ISendIp, char* buf, int len) {
 	STRU_LOGIN* rq = (STRU_LOGIN*) buf;
 	STRU_LOGIN rs;
-<<<<<<< HEAD
 	//登录处理
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	char sqlBuf[1024] = "";
 	list<string> listRes;
 	sprintf(sqlBuf, "select status from t_user where userid ='%s';", rq->szName);
@@ -231,12 +213,7 @@ void ckernel::Del_Add_RS(SOCKET ISendIp, char* buf, int len)
 
 			return;
 		}
-<<<<<<< HEAD
 		//双端关系都要添加
-=======
-
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		memset(sqlBuf,0,sizeof(sqlBuf));
 		sprintf(sqlBuf, "insert into t_friend value('%s','%s');", rq->friendName, rq->userName);
 		if (!sql.UpdateMySql(sqlBuf)) {
@@ -303,7 +280,6 @@ void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
 			cout << "sqlBuf:" << sqlBuf << endl;
 			cout << " UpdateMySql 数据库更新错误";
 
-<<<<<<< HEAD
 			return;
 		}
 		bzero(sqlBuf,sizeof(sqlBuf));
@@ -313,8 +289,6 @@ void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
 			cout << "sqlBuf:" << sqlBuf << endl;
 			cout << " UpdateMySql 数据库更新错误";
 
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 			return;
 		}
 
@@ -323,17 +297,7 @@ void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
 	//发送数据
 	send(ISendIp, (char*)&rs, rs.size,0);
 	bzero(sqlBuf,sizeof(sqlBuf));
-<<<<<<< HEAD
 	
-=======
-	sprintf(sqlBuf,"insert into t_score (userid) values('%s');",rq->userName);
-	if (!sql.UpdateMySql(sqlBuf)) {
-		cout << "sqlBuf:" << sqlBuf << endl;
-		cout << " UpdateMySql 数据库更新错误";
-
-		return;
-	}
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 }
 
 void ckernel::Del_Online(SOCKET ISendIp, char* buf, int len)
@@ -368,15 +332,9 @@ void ckernel::Del_Offline(SOCKET ISendIp, char* buf, int len)
 	cout << "OFFline success" << endl;
 	//关闭套接字
 	close(m_mapUseridToSocket[rq->userName]);
-<<<<<<< HEAD
 	//防止alive 的map 得到即将删除前的 map表，于是加锁
 	pthread_mutex_lock(&mapmutex);
 	m_AliveLoseCount[ISendIp] = -10;//即使alive会++ 但是最多5次 并且看到负数就直接删除
-=======
-	//于是在 alive 里面关闭
-	pthread_mutex_lock(&mapmutex);
-	m_AliveLoseCount[ISendIp] = -5;//alive 看到-1就直接删除
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	m_mapUseridToSocket.erase(rq->userName);
 	pthread_mutex_unlock(&mapmutex);
 }
@@ -454,22 +412,9 @@ void ckernel::Del_Add_Friend(SOCKET ISendIp, char* buf, int len)
 		strcpy( rs2.userName, rq->userName);
 		strcpy(rs2.friendName, rq->friendName);
 
-<<<<<<< HEAD
 		send(ISendIp, (char*)&rs, rs.size,0);
 
 		send(sock, (char*)&rs2, rs2.size,0);//把登陆请求返还给qt  让qt处理rq  这里只是核对有没有这个人  因为还有个是否同意
-=======
-		cout << "已发送好友请求" << endl;
-		SOCKET sock = m_mapUseridToSocket[rs.friendName];
-		strcpy(rs.friendName, add_success);
-		STRU_ADD_RS rs2;
-		strcpy( rs2.userName, rq->userName);
-		strcpy(rs2.friendName, rq->friendName);
-
-		send(ISendIp, (char*)&rs, rs.size,0);
-
-		send(sock, (char*)&rs2, rs2.size,0);//把登陆请求返还给qt  让qt处理rq  vs这里只是核对有没有这个人  因为还有个是否同意
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		//这里只是发信息成功
 		return;
 
@@ -502,12 +447,7 @@ void ckernel::Del_Join(SOCKET ISendIp, char* buf, int len)
 		send(ISendIp, (char*)&rq, rq.size,0);
 		return;
 	}
-<<<<<<< HEAD
 	
-=======
-
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	while (listRes.size() > 0) listRes.pop_front();
 	memset(sqlBuf, 0, sizeof(sqlBuf));
 	//得到房主名字
@@ -644,11 +584,7 @@ void ckernel::Del_Create(SOCKET ISendIp, char* buf, int len)
 		send(ISendIp,(char*)&rs, rs.size,0);
 		return;
 	};
-<<<<<<< HEAD
 	//给在线玩家发送 有新的创建房间的消息
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	for (auto ite = m_mapUseridToSocket.begin(); ite != m_mapUseridToSocket.end(); ite++) {
 		if(ite->second!= ISendIp)
 			send(ite->second, (char*)&rq, rq.size,0);
@@ -733,10 +669,7 @@ void ckernel::Del_Leave(SOCKET ISendIp, char* buf, int len)
 }
 
 void ckernel::Del_WaitOk(SOCKET ISendIp, char* buf, int len){
-<<<<<<< HEAD
 	//同步五子棋，当黑方确定了在白方在下
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	STRU_WaitOk*  rs = (STRU_WaitOk*)buf;
 	cout<<"friendname is "<<rs->friendname<<endl;
 	send(m_mapUseridToSocket[rs->friendname], (char*)rs,rs->size, 0);
@@ -855,14 +788,9 @@ void ckernel::Del_House_Info(SOCKET ISendIp, char* buf, int len) {
 	string userid = rs.username;
 	list<string> listRes;
 	char sqlBuf[1024] = "";
-<<<<<<< HEAD
 	//找到房间的房主名字
 	sprintf(sqlBuf, "select username from t_house where housename ='%s';",rs.HouseName);
 	//上面遍历显示的是hostname
-=======
-	sprintf(sqlBuf, "select hostname from t_house where housename ='%s';",rs.HouseName);
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	if (!sql.SelectMySql(sqlBuf, 1, listRes)) {
 		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
 		cout << "sqlBuf:" << sqlBuf << endl;
@@ -871,11 +799,7 @@ void ckernel::Del_House_Info(SOCKET ISendIp, char* buf, int len) {
 	}
 
 	while(listRes.size() > 0) {
-<<<<<<< HEAD
 		//发个请求端房间内的人
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		rs.nType = _def_PROTOCOL_House_List;
 		if (listRes.front() == userid) {
 			listRes.pop_front();
@@ -1063,11 +987,7 @@ void ckernel::DeleteFriend(SOCKET ISendIp, char* buf, int len) {
 	char sqlBuf[1024] = "";
 
 	sprintf(sqlBuf, "delete from t_friend where idA ='%s' and idB='%s';", rq.username,rq.username1);
-<<<<<<< HEAD
 	//修改数据库，删除 idA和idB的关系
-=======
-
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	if (!sql.UpdateMySql(sqlBuf)) {
 		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
 		cout << "sqlBuf:" << sqlBuf << endl;
@@ -1089,10 +1009,7 @@ void ckernel::DeleteFriend(SOCKET ISendIp, char* buf, int len) {
 }
 
 void ckernel::Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len){
-<<<<<<< HEAD
 	//好友约战
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	STRU_VsAnswer rq = *(STRU_VsAnswer*)buf;
 	cout<<"======================================================="<<endl;
 	cout<<"type is "<<rq.shouldDo<<endl;
@@ -1101,10 +1018,7 @@ void ckernel::Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len){
 	cout<<"friendname is "<<rq.friendname<<endl;
 	//friendname 会有为null的干扰
 	if(rq.shouldDo=='a'){
-<<<<<<< HEAD
 		//好友同意，并且为a是开始此时加入对局记录
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		char sqlBuf[1024] = "";
 		sprintf(sqlBuf,"insert into t_game value('%s','%s','%s',now(),now());",rq.username,rq.friendname,rq.Winname);
 		if (!sql.UpdateMySql(sqlBuf)) { 
@@ -1115,10 +1029,7 @@ void ckernel::Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len){
 
 	}else if(rq.shouldDo=='b'){
 		cout<<"b is update "<<endl;
-<<<<<<< HEAD
 		//好友约战结束，为b是对局结束的标志
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		char sqlBuf[1024] = "";
 		sprintf(sqlBuf,"update t_game set EndTime =now() ,win ='%s' where Time =(select ub.Time from (select *from t_game where idA='%s' and idB= '%s' order by Time desc limit 0,1) ub);",rq.Winname,rq.username,rq.friendname);
 		if (!sql.UpdateMySql(sqlBuf)) { 
@@ -1128,10 +1039,7 @@ void ckernel::Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len){
 
 		}
 		bzero(sqlBuf,sizeof(sqlBuf));
-<<<<<<< HEAD
 		//删除两人对战 因为异常退出的多余标记
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 		sprintf(sqlBuf,"delete from t_game where win ='No' and idA='%s' and idB='%s';",rq.username,rq.friendname);
 		if (!sql.UpdateMySql(sqlBuf)) {
 			cout << "sqlBuf:" << sqlBuf << endl;
@@ -1144,10 +1052,7 @@ void ckernel::Del_VsAnswerGame(SOCKET ISendIp, char* buf, int len){
 	}
 }
 void  ckernel::Del_vsHistory(SOCKET ISendIp, char* buf, int len){
-<<<<<<< HEAD
 	//显示战绩
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	STRU_VsHistory rq = *(STRU_VsHistory*)buf;
 	list<string> listRes;
 	char sqlBuf[1024] = "";
@@ -1160,10 +1065,7 @@ void  ckernel::Del_vsHistory(SOCKET ISendIp, char* buf, int len){
 		return;
 	}
 	bzero(sqlBuf,sizeof(sqlBuf));
-<<<<<<< HEAD
 	//更新胜利的局数
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	sprintf(sqlBuf,"update t_score set win =(select count('%s') from t_game where win ='%s') where userid ='%s';",rq.username,rq.username,rq.username);
 
 	if (!sql.UpdateMySql(sqlBuf)) {
@@ -1173,10 +1075,7 @@ void  ckernel::Del_vsHistory(SOCKET ISendIp, char* buf, int len){
 	}
 
 	bzero(sqlBuf,sizeof(sqlBuf));
-<<<<<<< HEAD
 	//得到更新后的结果
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	sprintf(sqlBuf,"select times,win from t_score where userid ='%s';",rq.username);
 	if (!sql.SelectMySql(sqlBuf, 2, listRes)) {
 		//让listRes  得到sqlBuf中的sql语句输入后的表格的前2列  
@@ -1184,10 +1083,7 @@ void  ckernel::Del_vsHistory(SOCKET ISendIp, char* buf, int len){
 		cout << "更新数据库错误" << endl;
 		return;
 	}
-<<<<<<< HEAD
 	//返还报文
-=======
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	rq.SumVs= atoi(listRes.front().c_str());
 	listRes.pop_front();
 	rq.win= atoi(listRes.front().c_str());

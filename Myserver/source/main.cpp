@@ -21,11 +21,7 @@ int main()
    //6*2 -生产者 main keepalive  manager 后为8
  
 	Thread_Pool_Create(8, 4);
-<<<<<<< HEAD
 	//释放核心功能类	
-=======
-	
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
 	free(kernel);
 	kernel =nullptr;
 	

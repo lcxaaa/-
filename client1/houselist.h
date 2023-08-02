@@ -25,13 +25,8 @@ public:
     void deleteItem(string name);//删除控件
     void closeEvent(QCloseEvent *e);
     void clearAll();
-<<<<<<< HEAD
     void Unstart();//非房主不可以开启，这个函数关闭它们的开始键显示
     void startPb();//开启房主的 开始键显示
-=======
-    void Unstart();
-    void startPb();
->>>>>>> 9b8b59bd73e9cb2f463f9a11963fa51210cdbd1d
     string HosueName;
 signals:
 void on_flush_list(string name);
