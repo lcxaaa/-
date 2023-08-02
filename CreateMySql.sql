@@ -35,6 +35,5 @@ create index houseIndex on t_house(username);
   win varchar(20) unique not null ,
   Time datetime not null,
   EndTime datetime not null
-  Time datetime not null
 
   );
