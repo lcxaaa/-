@@ -14,10 +14,10 @@ class TalkInfo : public QWidget
 public:
     explicit TalkInfo(QWidget *parent = nullptr);
     ~TalkInfo();
-    string GetTalk(string name);
-    void SetTalk(string s,QString chat);
-    string friendname;
-    void SetEmplty();
+    string GetTalk(string name);//得到聊天的文本
+    void SetTalk(string s,QString chat);//设置文本
+    string friendname;//好友名字，即对方名字
+    void SetEmplty();//清空输入框
 public slots:
     void on_SendInfo_clicked();
     void on_PlayWithFriend_clicked();

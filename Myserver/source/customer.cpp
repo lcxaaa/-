@@ -16,16 +16,9 @@ extern int serverfd;
 void* customerWork(void*val){
 	//printf("thread %d  id:%lu is working\n",(int)val,pthread_self());
 	
-	char filename[100];
-	sprintf(filename,"./temp/Recv%lu",pthread_self());
-	int MMapFd =open(filename,O_RDWR|O_CREAT,0664);
-	ftruncate(MMapFd,2048);
-	lseek(MMapFd,0,SEEK_SET);
-	char* buf = (char*)mmap(NULL,2048,PROT_READ|PROT_WRITE,MAP_SHARED,MMapFd,0);
-	char * bufSave =buf;
-
 	while(pool->able){
 		pthread_mutex_lock(&mutex);
+		//等待任务队列
 		while(pool->cur==0&&!pool->dead)
 			pthread_cond_wait(&CR,&mutex);	
 
@@ -34,26 +27,26 @@ void* customerWork(void*val){
 			pool->busy--;
 		
 			pthread_mutex_unlock(&mutex);
-
+		//得到队列里面的套接字
 			int clientfd = GetContainer();
-			//char buf[1024];
+			if(clientfd==-1){
+				printf("customer error\n");
+			}
+			char buf[1024];
+			//接受信息
 			int size = recv(clientfd,buf,2048,0);
 			int temp=0,ans=0;
-
+			cout<<"size == "<<size<<endl;
 			if(size ==0){
-				printf("client close fd\n");
-				close(clientfd);
+				//size为0表示对端断开连接
 				epoll_ctl(epfd,EPOLL_CTL_DEL,clientfd,NULL);
 				pool->busy++;
-
-				lseek(MMapFd,0,SEEK_SET);
-				bzero(buf,2048);
-
 				continue;
 			}
 
 			while(size>0){
 				if(ans+4<=2048){
+					//一个协议包 前4个为 type而 前4-8为 size 大小
 					temp =*(int*)(buf+ans+4);
 					cout<<"temp size:"<<temp<<endl;
 				}else{
@@ -62,15 +55,12 @@ void* customerWork(void*val){
 
 				int type = *(int*)(buf+ans);
 				if(temp==0&&type==0) break;
+				//进入核心类进行处理
 				kernel->Deal(clientfd,type,buf+ans,temp);
 				ans+=temp;
 				size-=temp;
 			}
-
-			lseek(MMapFd,0,SEEK_SET);
-			buf = bufSave;
-			bzero(buf,2048);
-						
+				
 			pool->busy++;
 		}else{
 			pool->dead --;
@@ -84,10 +74,4 @@ void* customerWork(void*val){
 	pool->busy--;
 	pool->work--;
 	pthread_mutex_unlock(&mutex);
-
-	munmap(bufSave,2048);
-	close(MMapFd);
-	remove(filename);
-
-
 }

@@ -14,19 +14,19 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void closeEvent(QCloseEvent *e);
+    void closeEvent(QCloseEvent *e);//关闭窗口事件
 private slots:
 
-    void on_Login_clicked();
+    void on_Login_clicked();//登陆按键
 
-    void on_register_2_clicked();
+    void on_register_2_clicked();//注册按键
 
 private:
     Ui::MainWindow *ui;
 signals:
     void on_login_net();
     void on_register_net();
-    void on_closeN();
+    void on_closeN();//关闭窗口时产生的事件
 public:
     char userName[_DEF_NAME_SIZE_];//用户名字
     char password[_DEF_PASSWORD_SIZE];

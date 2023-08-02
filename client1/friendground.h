@@ -16,12 +16,15 @@ class FriendGround : public QWidget
 public:
     explicit FriendGround(QWidget *parent = nullptr);
     ~FriendGround();
-    void addItem(friendinfo* info);
-    void deleteItem(friendinfo* info);
+    void addItem(friendinfo* info);//添加控件
+    void deleteItem(friendinfo* info);//删除控件
+    //实现滚轮
         QVBoxLayout *layout;
+           QWidget *widget;
         void closeEvent(QCloseEvent *e);
+        //忽略好友请求的容器
         map<string,bool> m_FriendIgnored;
-        string ShouldAnsName;
+        string ShouldAnsName;//最近一次向用户发出聊天的好友
 private:
     Ui::FriendGround *ui;
 

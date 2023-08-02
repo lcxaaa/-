@@ -19,13 +19,14 @@ public:
     explicit houseList(QWidget *parent = nullptr);
     ~houseList();
 
-    void AddItem(string name);
+    void AddItem(string name);//添加玩家控件
     QVBoxLayout *layout;
     list<HouseuserList*> Plain;
-    void deleteItem(string name);
+    void deleteItem(string name);//删除控件
     void closeEvent(QCloseEvent *e);
     void clearAll();
-    void Unstart();
+    void Unstart();//非房主不可以开启，这个函数关闭它们的开始键显示
+    void startPb();//开启房主的 开始键显示
     string HosueName;
 signals:
 void on_flush_list(string name);

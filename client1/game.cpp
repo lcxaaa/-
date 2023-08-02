@@ -23,6 +23,7 @@ Game::Game(QWidget *parent) :
    AiMode =false;
    conPlay =true;
    VSmode =false;
+   setWindowTitle("五子棋界面");
 }
 
 Game::~Game()
@@ -59,6 +60,8 @@ void Game::draw23(int changeD){
                     emit  on_sendCless_msg(i,j);
 
                     if(cless->CheakWin(clessArray[i][j].color)){
+                    //如果自己不是白棋，说明对方胜利  注意 仅仅房主发送/邀请方
+                    //使用是否白棋来判断是否房主发送/邀请方
 
                     msgBox.setText("提示");
                     msgBox.setInformativeText("白棋胜利，确认退出?");
@@ -104,6 +107,7 @@ void Game::draw23(int changeD){
 
             if(cless->CheakWin(clessArray[i][j].color)){
 
+                //如果自己不是白棋，说明对方胜利  注意 仅仅房主发送/邀请方  而且是非AI模式
 
                                 msgBox.setText("提示");
                                 msgBox.setInformativeText("黑棋棋胜利，确认退出?");
@@ -318,6 +322,7 @@ void Game::on_pushButton_2_clicked()
     if(cless->change==0){
 
     if(ret == QMessageBox::Ok){
+        //发送自己失败
         Pix=QPixmap(600, 600);
         Pix.fill(Qt::white);
         first =true;
@@ -332,6 +337,7 @@ void Game::on_pushButton_2_clicked()
         }
          draw23(cless->change);
         emit on_sendFaile();
+
         //发送报文 还要确认对方是否继续
     }
 
@@ -353,6 +359,7 @@ void Game::on_pushButton_2_clicked()
              draw23(cless->change);
             emit on_sendFaile();
             //发送报文 还要确认对方是否继续
+            emit on_EndVsgame(againestName,againestName,"b");
         }
     //
     }
@@ -371,6 +378,7 @@ void Game::on_QuitPB_clicked()
 
 
     if(ret == QMessageBox::Ok){
+        //发送自己失败
         Pix=QPixmap(600, 600);
         Pix.fill(Qt::white);
         first =true;
@@ -381,13 +389,16 @@ void Game::on_QuitPB_clicked()
         Dchange=1;
         cless->ClearAll();
         draw23(cless->change);
+
         //告诉对面我已经退出
         this->close();
         }
+        emit on_EndVsgame(againestName,"Myname","b");
         Dchange=1;
         cless->ClearAll();
         draw23(cless->change);
          emit on_sendask_Cheak("Quit");
+
         this->close();
     }
 }
@@ -1040,8 +1051,15 @@ void  Game::on_Deal_AIgame(){
     this->ui->label_3->show();
     AiMode =true;
     first =true;
+    //this->ui->GameChat->hide();
     Dchange =1;
     Pix=QPixmap(600, 600);
     Pix.fill(Qt::white);
     AIandPlayDraw(1);
 }
+
+void Game::on_GameChat_clicked()
+{
+    emit void on_sendGameChatMsg();
+}
+

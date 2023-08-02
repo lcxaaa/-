@@ -16,9 +16,9 @@ public:
     ~housename();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_pushButton_clicked();//发送创建的房间的名字
 
-    void on_pushButton_2_clicked();
+    void on_pushButton_2_clicked();//清空文本
 
 signals:
     void on_housename_send(string housename);

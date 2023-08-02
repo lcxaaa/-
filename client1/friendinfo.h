@@ -15,15 +15,15 @@ class friendinfo : public QWidget
 public:
     explicit friendinfo(QWidget *parent = nullptr);
     ~friendinfo();
-    string friendname;
-    void GetName();
-        void closeEvent(QCloseEvent *);
+    string friendname;//好友名字
+    void GetName();//得到ui控件里面的字
         TalkInfo * m_talk;
 public slots:
     void on_sendMsgTo_clicked();
 signals:
-    void on_send_chatmsg(string friends);
-    void on_send_DelFriend(string friends);
+    //控件产生的信号
+    void on_send_chatmsg(string friends);//聊天信号
+    void on_send_DelFriend(string friends);//删除好友信号
 private slots:
     void on_DelFriend_clicked();
 

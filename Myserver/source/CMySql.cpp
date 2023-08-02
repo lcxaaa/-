@@ -1,6 +1,5 @@
 //#include "stdafx.h"
 #include "../include/CMySql.h"
-unsigned int timeout = 7;
 
 CMySql::CMySql(void)
 {
@@ -8,8 +7,10 @@ CMySql::CMySql(void)
     如果你传入的参数是NULL指针，它将自动为你分配一个MYSQL对象，
     如果这个MYSQL对象是它自动分配的，那么在调用mysql_close的时候，会释放这个对象*/
     m_sock = new MYSQL;
+	char value = 1;
     mysql_init(m_sock);  
     mysql_set_character_set(m_sock, "gb2312"); //gb2312 中华人民共和国简体字标准
+	mysql_options(m_sock, MYSQL_OPT_RECONNECT,&value);
 }
 
 
@@ -28,13 +29,8 @@ void CMySql::DisConnect()
 
 bool CMySql::ConnectMySql(char *host, char *user, char *pass, char *db, short nport)
 {
-	int ret = mysql_options(m_sock,MYSQL_OPT_CONNECT_TIMEOUT,(const char*)&timeout);//设置超时选项
-	     if(ret){
-			printf("Options Set ERRO!\n");
-			return false;
-		}
 
-		 
+	//连接mysql服务器 
 	if(!mysql_real_connect(m_sock,host,user,pass,db,0,NULL,0)) return false;
 
 	/*
@@ -49,6 +45,7 @@ bool CMySql::ConnectMySql(char *host, char *user, char *pass, char *db, short np
  bool  CMySql::GetTables(char* szSql, list<string>& lstStr)
  {
     if(mysql_query(m_sock, szSql)) {
+		//查看是否连接失败
 		std::cout << mysql_error(m_sock) << std::endl;;
 		return false;
 	}
@@ -58,6 +55,7 @@ bool CMySql::ConnectMySql(char *host, char *user, char *pass, char *db, short np
 		return false;
 	}
 	while (m_record = mysql_fetch_row(m_results)) {
+		//得到列表名字
 		lstStr.push_back(m_record[0]);
 	}
     return true;
@@ -65,8 +63,12 @@ bool CMySql::ConnectMySql(char *host, char *user, char *pass, char *db, short np
 bool CMySql::SelectMySql(char* szSql, int nColumn, list<string>& lstStr)
 {
 
-	mysql_ping(m_sock); 
-
+	if(mysql_ping(m_sock)){
+		//mysql_close(m_sock);
+		//查看是否还和服务器进行连接
+		//ping 会重新连接到服务器
+		//即 使用mysql_ping能够自动重连数据库
+	} 
     //mysql_query() 函数用于向 MySQL 发送并执行 SQL 语句
 	if(mysql_query(m_sock, szSql)) {
 		std::cout <<"query "<< mysql_error(m_sock) << std::endl;;
@@ -84,7 +86,7 @@ bool CMySql::SelectMySql(char* szSql, int nColumn, list<string>& lstStr)
     if(NULL == m_results)return false;
 	//遍历表中的下一行，取出内容放入m_record 结果集
 	while (m_record = mysql_fetch_row(m_results)) {
-        
+        //得到每行的数据
 		for(int i = 0; i < nColumn; i++) {
 			if(!m_record[i]) {
 				lstStr.push_back("");//没有就放空字符串
@@ -94,7 +96,7 @@ bool CMySql::SelectMySql(char* szSql, int nColumn, list<string>& lstStr)
         }
 	}
 
-	mysql_free_result(m_results);
+	mysql_free_result(m_results);//释放结果集
     return true;
 }
 
@@ -105,7 +107,7 @@ bool CMySql::SelectMySql(char* szSql, int nColumn, list<string>& lstStr)
 		std::cout << mysql_error(m_sock) << std::endl;;
 		return false;
 	}
-    if(mysql_query(m_sock, szSql)) {
+    if(mysql_query(m_sock, szSql)) { //修改数据表
 		std::cout << mysql_error(m_sock) << std::endl;;
 		return false;
 	}

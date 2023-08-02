@@ -25,7 +25,7 @@ using namespace std;
 
 #define _DEF_NAME_SIZE_ (10) //名字长度
 #define _DEF_CONTENT_SIZE (900)//聊天内容长度
-#define _DEF_PROTOCOL_COUNT (27)//函数偏移
+#define _DEF_PROTOCOL_COUNT (29)//函数偏移
 #define _DEF_PASSWORD_SIZE (40)//密码
 #define _DEF_HOUSE_ID_SIZE (10) //房间名字长度
 #define _DEF_PROTOCOL_BASE_ (900) //协议头开始
@@ -109,6 +109,12 @@ using namespace std;
 #define _def_PROTOCOL_DelFriend (_DEF_PROTOCOL_BASE_ + 25)
 
 #define _def_PROTOCOL_WaitOk (_DEF_PROTOCOL_BASE_ + 26)
+
+//对局结果
+#define _def_PROTOCOL_VSanwser (_DEF_PROTOCOL_BASE_ + 27)
+//对局记录
+#define _def_PROTOCOL_History (_DEF_PROTOCOL_BASE_ + 28)
+
 //登陆协议包
 struct STRU_LOGIN {
 	STRU_LOGIN() :nType(_DEF_PROTOCOL_Login_),size(sizeof(STRU_LOGIN)) {
@@ -141,6 +147,7 @@ struct STRU_ADD {
 	char userName[_DEF_NAME_SIZE_];//用户名字
 	char friendName[_DEF_NAME_SIZE_];
 };
+//最后添加好友的 确认报文
 struct STRU_ADD_RS2 {
 	STRU_ADD_RS2() :nType(_def_PROTOCOL_add_friend_rs2),size(sizeof(STRU_ADD_RS2)) {
 		memset(userName, 0, _DEF_NAME_SIZE_);
@@ -242,6 +249,7 @@ struct STRU_CREATE {
 	char HouseName[_DEF_HOUSE_ID_SIZE];//房间名字
 	char hostName[_DEF_NAME_SIZE_];
 };
+//创建房间回复
 struct STRU_CREATE_RS {
 	STRU_CREATE_RS() :nType(_def_PROTOCOL_Create_Rs),size(sizeof(STRU_CREATE_RS)) {
 		memset(HouseName, 0, _DEF_HOUSE_ID_SIZE);
@@ -292,6 +300,7 @@ struct STRU_PLAY {
 	char username[_DEF_NAME_SIZE_];//用户名字
 	char username1[_DEF_NAME_SIZE_];//对方用户名字
 };
+//房间刷新
 struct STRU_HOUSE_flush {
 	STRU_HOUSE_flush() :nType(_def_PROTOCOL_reflush) ,size(sizeof(STRU_HOUSE_flush)){
 		memset(HouseName, 0, _DEF_HOUSE_ID_SIZE);
@@ -321,6 +330,7 @@ struct STRU_PLAY_Process {
 	char username[_DEF_NAME_SIZE_];//用户名字
 	char username1[_DEF_NAME_SIZE_];//对方用户名字
 };
+//结束是否继续的确认报文
 struct STRU_PLAY_Cheak {
 	STRU_PLAY_Cheak() :nType(_def_PROTOCOL_STRU_PLAY_Cheak),size(sizeof(STRU_PLAY_Cheak)){
 		memset(username, 0, sizeof(username));
@@ -338,7 +348,7 @@ struct STRU_PLAY_Cheak {
 	char username1[_DEF_NAME_SIZE_];//对方用户名字
 	char quest[6];
 };
-
+//失败报文
 struct STRU_MyFailedk {
 	STRU_MyFailedk() :nType(_def_PROTOCOL_STRU_MyFailed),size(sizeof(STRU_MyFailedk)){
 		memset(username, 0, sizeof(username));
@@ -356,7 +366,7 @@ struct STRU_MyFailedk {
 	char username1[_DEF_NAME_SIZE_];//对方用户名字
 	char quest[6];
 };
-
+//心跳报文
 struct STRU_AliveTest {
 	STRU_AliveTest() :nType(_def_PROTOCOL_AliveTest) ,size(sizeof(STRU_AliveTest)){
 		memset(quest, 0, sizeof(quest));
@@ -368,7 +378,7 @@ struct STRU_AliveTest {
 	char username[_DEF_NAME_SIZE_];//用户名字
 	char quest[6];//内容
 };
-
+//删除并且刷新的报文
 struct STRU_DeleteReflush {
 	STRU_DeleteReflush() :nType(_def_PROTOCOL_DeleteHouseReflush),size(sizeof(STRU_DeleteReflush)) {
 		memset(HouseName, 0, sizeof(HouseName));
@@ -382,7 +392,7 @@ struct STRU_DeleteReflush {
 	char username[_DEF_NAME_SIZE_];//用户名字
 	char hostname[_DEF_NAME_SIZE_];//房主名字
 };
-
+//房间内刷新报文
 struct STRU_HouseNumReflush {
 	STRU_HouseNumReflush() :nType(_def_PROTOCOL_HouseNumberReflush),size(sizeof(STRU_HouseNumReflush)) {
 		memset(HouseName, 0, sizeof(HouseName));
@@ -397,7 +407,7 @@ struct STRU_HouseNumReflush {
 	char hostname[_DEF_NAME_SIZE_];//房主名字
 	char username1[_DEF_NAME_SIZE_];//判断的名字
 };
-
+//中途加入报文
 struct STRU_AskHostJoin {
 	STRU_AskHostJoin() :nType(_def_PROTOCOL_AskHostJoin) ,size(sizeof(STRU_AskHostJoin)){
 		memset(HouseName, 0, sizeof(HouseName));
@@ -412,7 +422,7 @@ struct STRU_AskHostJoin {
 	char hostname[_DEF_NAME_SIZE_];//房主名字
 	char username1[_DEF_NAME_SIZE_];//房主名字
 };
-
+//删除好友报文
 struct STRU_DelFriend {
 	STRU_DelFriend() :nType(_def_PROTOCOL_DelFriend) ,size(sizeof(STRU_DelFriend)){
 		memset(username, 0, sizeof(username));
@@ -423,7 +433,7 @@ struct STRU_DelFriend {
 	char username[_DEF_NAME_SIZE_];//用户名字
 	char username1[_DEF_NAME_SIZE_];//房主名字
 };
-
+//同步报文
 struct STRU_WaitOk {
 	STRU_WaitOk() :nType(_def_PROTOCOL_WaitOk) ,size(sizeof(STRU_WaitOk)),status(0){
 		memset(username, 0, sizeof(username));
@@ -435,4 +445,31 @@ struct STRU_WaitOk {
 	char username[_DEF_NAME_SIZE_];//用户名字
 	char friendname[_DEF_NAME_SIZE_];//房主名字
 };
-
+//好友对战结果报文
+struct STRU_VsAnswer {
+	STRU_VsAnswer() :nType(_def_PROTOCOL_VSanwser) ,size(sizeof(STRU_VsAnswer)){
+		memset(username, 0, sizeof(username));
+		memset(friendname, 0, sizeof(friendname));
+		memset(Winname, 0, sizeof(Winname));
+		shouldDo = 'a';//为a表示开始
+	}
+	int nType;
+	int size;
+	char shouldDo;
+	char Winname[_DEF_NAME_SIZE_];//赢的人的名字
+	char username[_DEF_NAME_SIZE_];//用户名字
+	char friendname[_DEF_NAME_SIZE_];//对手
+};
+//战绩的报文
+struct STRU_VsHistory {
+	STRU_VsHistory() :nType(_def_PROTOCOL_History) ,size(sizeof(STRU_VsHistory)){
+		memset(username, 0, sizeof(username));
+		win =0,SumVs=0;
+	}
+	//s=时间数据库使用curadte()得到
+	int nType;
+	int size;
+	char username[_DEF_NAME_SIZE_];//用户名字
+	int win;
+	int SumVs;
+};

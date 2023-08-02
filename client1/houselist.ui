@@ -81,10 +81,10 @@
      <x>0</x>
      <y>0</y>
      <width>271</width>
-     <height>371</height>
+     <height>381</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout"/>
+   <layout class="QVBoxLayout" name="verticalLayout_2"/>
   </widget>
   <zorder>pushButton_2</zorder>
   <zorder>pushButton</zorder>

@@ -24,8 +24,8 @@ class ckernel : public QObject
 public:
      ~ckernel();
     explicit ckernel(QObject *parent = nullptr);
-    PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];
-
+    PFUN m_netProtocolMap[_DEF_PROTOCOL_COUNT];//类函数指针，利用类函数指针 直到type后就可以一个语句执行多个函数
+        void PFUNinit();//类函数指针初始化
         void Del_Online(long ISendIp, char* buf, int nLen);
         void Del_Playing(long ISendIp, char* buf, int nLen);
         void Del_Offline(long ISendIp, char* buf, int nLen);
@@ -52,28 +52,30 @@ public:
         void Del_HouseNumber(long ISendIp, char* buf, int nLen);
         void Del_HostAsk(long ISendIp, char* buf, int nLen);
         void Del_WaitOk(long ISendIp, char* buf, int nLen);
-        string HouseName;
-        void deleteItem(string s);
+        void Del_Vshistory(long ISendIp, char* buf, int nLen);
+        string HouseName;//所在房间的名字
+
+        void deleteItem(string s);//删除用户控件
     private:
+
         NetMediator* Mediator;
         MainWindow* m_wnd;
         Ground* m_Ground;
         addfriend* m_add;
         list<friendinfo*> m_Finfo;
-
         FriendGround* m_fGround;
         housename* m_houname;
         list<House*>m_house;
         houseList* m_houseL;
         Game *gameList;
 public slots:
-        void Deal(long ISendIp, char* buf, int nLen);
+        //接收对应信号，执行功能的槽函数 一把为发送报文
+    void Deal(long ISendIp, char* buf, int nLen);
     void On_Deal_Login();
     void On_Deal_Register();
     void On_Deal_ONLINE();
     void On_Deal_ADD();
     void On_Deal_OFFLINE();
-
     void On_Deal_CHAR(string friends,TalkInfo* m);
     void On_Deal_INFO();
     void On_Deal_JOIN(string housename);
@@ -90,6 +92,8 @@ public slots:
     void On_Deal_HouseFlush(string s);
     void On_Deal_DelFrriend(string friendName);
     void On_Deal_CloseNow();
+    void On_Deal_SendVsMsg(string winner,string againestName,string DO);
+    void On_Deal_GetVsHistory();
 };
 
 #endif // CKERNEL_H

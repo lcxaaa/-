@@ -18,12 +18,12 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>72</width>
-     <height>15</height>
+     <width>101</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>好友列表</string>
+    <string>在线好友列表</string>
    </property>
   </widget>
   <widget class="QScrollArea" name="scrollArea">
@@ -47,6 +47,20 @@
       <height>519</height>
      </rect>
     </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>3</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>3</number>
+     </property>
+    </layout>
    </widget>
   </widget>
  </widget>

@@ -6,14 +6,27 @@ FriendGround::FriendGround(QWidget *parent) :
     ui(new Ui::FriendGround)
 {
     ui->setupUi(this);
-    layout=new QVBoxLayout();
-      layout->setDirection(QBoxLayout::TopToBottom);
-    this->setLayout(layout);
+    widget = new QWidget(ui->scrollArea);
+    widget->setFixedSize(1000, 1000);
+      widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+      layout = new QVBoxLayout(widget);
+      ui->scrollArea->setWidget(widget);
+         ui->scrollArea->setWidgetResizable(true);
+         ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+          ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // 水平滚动条不需显示
+      setWindowTitle("好友界面");
 }
 
 FriendGround::~FriendGround()
 {
-    delete layout;
+    if(layout){
+        delete layout;
+        layout =nullptr;
+    }
+    if(widget){
+        delete widget;
+        widget =nullptr;
+    }
     delete ui;
 }
 void FriendGround::addItem(friendinfo* info){

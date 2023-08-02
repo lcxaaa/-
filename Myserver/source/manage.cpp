@@ -10,8 +10,8 @@ extern int serverfd;
 
 
 int FindAlive(pthread_t tid){
-	int res = pthread_kill(tid,0);
-	if(res==ESRCH){
+	pthread_kill(tid,0);
+	if(errno==ESRCH){
 		return 0;	
 	}
 	return 1;
@@ -100,6 +100,7 @@ void * manageWork(void* val){
 			pool->dead=pool->busy - pool->min+(pool->max-pool->min)/2;
 			
 		}else if(pool->busy<pool->min){
+			//少于最小的维持状态
 			int nums = pool->min+(pool->max-pool->min)/2- pool->busy;
 			for(int i=0,j=0;i<pool->max;i++){
 				if(pool->ct[i]==-1){

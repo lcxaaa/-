@@ -5,6 +5,7 @@ addfriend::addfriend(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::addfriend)
 {
+    setWindowTitle("添加好友界面");
     ui->setupUi(this);
 }
 

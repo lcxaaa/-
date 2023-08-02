@@ -16,6 +16,12 @@ housename::~housename()
 void housename::on_pushButton_clicked()
 {
     string housename = ui->lineEdit->text().toStdString();
+    bool b = ui->lineEdit->text().contains(QRegExp("[\\x4e00-\\x9fa5]+"));
+    if(b)
+    {
+        QMessageBox::about(this,"提示","不可以含中文");
+        return;
+    }
     if(housename.size()>9){
          QMessageBox::about(this,"提示","房间名字过长");
          this->ui->lineEdit->clear();

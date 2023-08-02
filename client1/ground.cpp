@@ -7,14 +7,28 @@ Ground::Ground(QWidget *parent) :
 {
 
     ui->setupUi(this);
-    layout=new QVBoxLayout();
-      layout->setDirection(QBoxLayout::TopToBottom);
-    this->setLayout(layout);
+     widget = new QWidget(ui->scrollArea);
+     widget->setFixedSize(1000, 1000);
+       widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+       layout = new QVBoxLayout(widget);
       firstOpen =true;
+       ui->scrollArea->setWidget(widget);
+          ui->scrollArea->setWidgetResizable(true);
+          ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+           ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // 水平滚动条不需显示
+           setWindowTitle("大厅界面");
 }
 
 Ground::~Ground()
 {
+    if(layout){
+        delete layout;
+        layout =nullptr;
+    }
+    if(widget){
+        delete widget;
+        widget =nullptr;
+    }
     delete ui;
 }
 
@@ -24,10 +38,10 @@ void Ground::on_pushButton_3_clicked(){
 }
 void Ground::AddItem(House* m_house){
 
-    ui->verticalLayout->addWidget((m_house));
+    layout->addWidget(m_house);
 }
 void Ground::DelItem(House* m_house){
-    ui->verticalLayout->removeWidget(m_house);
+    layout->removeWidget(m_house);
 }
 
 void Ground::on_friendinfo_clicked()
@@ -64,12 +78,14 @@ void Ground::on_pushButton_clicked()
 
 void Ground::on_AiGamePb_clicked()
 {
+    QMessageBox::about(this,"提示","和AI对战不记入战绩");
     emit on_Ai_Game();
 }
 
 
+
 void Ground::on_pushButton_2_clicked()
 {
-    emit on_ShowSetting();
+    emit on_GetVshistory();
 }
 

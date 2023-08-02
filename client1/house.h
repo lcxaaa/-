@@ -15,13 +15,13 @@ public:
     explicit House(QWidget *parent = nullptr);
     ~House();
 
-    void SetHouseName(string housename);
-        string housename;
+    void SetHouseName(string housename);//设置ui 里面的房间名字
+        string housename;//房间名字
 private slots:
-    void on_pushButton_clicked();
+    void on_pushButton_clicked();//加入房间的槽函数
 
 signals:
-    void on_join_house(string housename);
+    void on_join_house(string housename);//发给ckernel的加入房间的信号
 private:
     Ui::House *ui;
 };

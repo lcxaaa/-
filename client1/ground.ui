@@ -65,17 +65,6 @@
     <string>刷新</string>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>10</y>
-     <width>401</width>
-     <height>511</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout"/>
-  </widget>
   <widget class="QPushButton" name="AiGamePb">
    <property name="geometry">
     <rect>
@@ -89,12 +78,63 @@
     <string>人机对战</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>250</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>战绩</string>
+   </property>
+  </widget>
+  <widget class="QScrollArea" name="scrollArea">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>511</width>
+     <height>511</height>
+    </rect>
+   </property>
+   <property name="widgetResizable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="scrollAreaWidgetContents">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>509</width>
+      <height>509</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>3</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>3</number>
+     </property>
+    </layout>
+   </widget>
+  </widget>
   <zorder>pushButton</zorder>
   <zorder>create_house</zorder>
   <zorder>pushButton_3</zorder>
   <zorder>friendinfo</zorder>
-  <zorder>verticalLayoutWidget</zorder>
   <zorder>AiGamePb</zorder>
+  <zorder>pushButton_2</zorder>
+  <zorder>scrollArea</zorder>
  </widget>
  <resources/>
  <connections/>

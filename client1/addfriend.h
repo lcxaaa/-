@@ -16,9 +16,9 @@ public:
     ~addfriend();
 
 private slots:
-    void on_addfriend_2_clicked();
+    void on_addfriend_2_clicked();//点击添加后执行的槽函数
 signals:
-    void on_sendaddfriend();
+    void on_sendaddfriend();//添加好友信号
 private:
     Ui::addfriend *ui;
     public:
