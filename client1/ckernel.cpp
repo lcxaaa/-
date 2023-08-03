@@ -3,6 +3,7 @@
 #include"NET.h"
 #include<QTextCodec>
 #include<QMessageBox>
+#include"./md5.h"
 
 extern     ckernel* kernel;
 int OfflineAble =1;
@@ -339,6 +340,12 @@ void ckernel::Del_Chat(long ISendIp, char* buf, int nLen)
         QMessageBox msgBox;
         msgBox.setText("提示");
         msgBox.setInformativeText("好友不在线，无法收到消息");
+        msgBox.exec();
+        return;
+    }else if(strcmp(rq->content,"unsafe")==0){
+        QMessageBox msgBox;
+        msgBox.setText("提示");
+        msgBox.setInformativeText("网络不安全，遭到篡改");
         msgBox.exec();
         return;
     }
@@ -971,20 +978,33 @@ void  ckernel::On_Deal_Login(){
         }
     }
     //得到密码加密过后的md5值
-    char tmpstr[256];
-    strcpy(tmpstr,m_wnd->password);
-    char buf1[40];
+    MD5_CTX ctx;
 
-    unsigned int* tmpGroup = MD5(tmpstr);
+    unsigned  char  *data= ( unsigned  char  *)m_wnd->password ;
 
-    snprintf(buf1, 9, "%8X", tmpGroup[0]);  //A
-    snprintf(buf1 + 8, 9, "%8X", tmpGroup[1]);  //B
-    snprintf(buf1 + 16, 9, "%8X", tmpGroup[2]);  //C
-    snprintf(buf1 + 24, 9, "%8X", tmpGroup[3]);  //D
-    cout << buf1 << endl;
-    delete[] tmpGroup;
+    unsigned  char  md[16];
 
-    strcpy(SL.password,buf1);
+    char  buf[33]={ '\0' };
+
+    char  tmp[3]={ '\0' };
+
+    int  i;
+
+    MD5Init(&ctx);
+
+    MD5Update(&ctx,data,strlen((char*)data));
+
+    MD5Final(&ctx,md);
+
+    for ( i=0; i<16; i++ ){
+
+    sprintf (tmp, "%02X" ,md[i]);
+
+    strcat (buf,tmp);
+
+    }
+
+    strcpy(SL.password,buf);
     strcpy(SL.szName,m_wnd->userName);
     Mediator->net->Send((char*)&SL,SL.size);//发送MD5值
     //实际上可以添加一个字符串，实现加盐
@@ -1018,19 +1038,33 @@ void  ckernel::On_Deal_Register(){
         QMessageBox::about(m_Ground,"提示","密码不可以超过15个字符");
         return;
     }
-    char tmpstr[256];
-    strcpy(tmpstr,m_wnd->password);
-    char buf1[40];
-    //MD5处理
-    unsigned int* tmpGroup = MD5(tmpstr);
+    MD5_CTX ctx;
 
-    snprintf(buf1, 9, "%8X", tmpGroup[0]);  //A
-    snprintf(buf1 + 8, 9, "%8X", tmpGroup[1]);  //B
-    snprintf(buf1 + 16, 9, "%8X", tmpGroup[2]);  //C
-    snprintf(buf1 + 24, 9, "%8X", tmpGroup[3]);  //D
-    cout << buf1 << endl;
-    delete[] tmpGroup;
-   strcpy(SR.password,buf1);
+    unsigned  char  *data= ( unsigned  char  *)m_wnd->password ;
+
+    unsigned  char  md[16];
+
+    char  buf[33]={ '\0' };
+
+    char  tmp[3]={ '\0' };
+
+    int  i;
+
+    MD5Init(&ctx);
+
+    MD5Update(&ctx,data,strlen((char*)data));
+
+    MD5Final(&ctx,md);
+
+    for ( i=0; i<16; i++ ){
+
+    sprintf (tmp, "%02X" ,md[i]);
+
+    strcat (buf,tmp);
+
+    }
+
+   strcpy(SR.password,buf);
    strcpy(SR.userName,m_wnd->userName);
    Mediator->net->Send((char*)&SR,SR.size);//发送报文，此时密码为MD5
 }
@@ -1095,6 +1129,33 @@ void  ckernel::On_Deal_CHAR(string friends,TalkInfo* m){
     strcpy(rq.content,m->GetTalk(friends).c_str());
     strcpy(rq.szName,m_wnd->userName);
     strcpy(rq.friendName,friends.c_str());
+
+    MD5_CTX ctx;
+
+    unsigned  char  *data= ( unsigned  char  *)rq.content ;
+
+    unsigned  char  md[16];
+
+    char  buf[33]={ '\0' };
+
+    char  tmp[3]={ '\0' };
+
+    int  i;
+
+    MD5Init(&ctx);
+
+    MD5Update(&ctx,data,strlen((char*)data));
+
+    MD5Final(&ctx,md);
+
+    for ( i=0; i<16; i++ ){
+
+    sprintf (tmp, "%02X" ,md[i]);
+
+    strcat (buf,tmp);
+
+    }
+    strcpy(rq.MD5,buf);
      Mediator->net->Send((char*)&rq,rq.size);
 }
 void ckernel:: On_Deal_INFO(){

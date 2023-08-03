@@ -297,7 +297,7 @@ void ckernel::Del_Register(SOCKET ISendIp, char* buf, int len)
 	//发送数据
 	send(ISendIp, (char*)&rs, rs.size,0);
 	bzero(sqlBuf,sizeof(sqlBuf));
-	
+
 }
 
 void ckernel::Del_Online(SOCKET ISendIp, char* buf, int len)
@@ -349,6 +349,44 @@ void ckernel::Del_Chat(SOCKET ISendIp, char* buf, int len)
 	cout << "get Del_Chat" << endl;
 	//发送文本，后期可以加密
 	STRU_CHAR rq = *(STRU_CHAR*)buf;
+
+
+	MD5_CTX ctx;
+
+	unsigned  char  *data= (unsigned char *) rq.content;
+
+	unsigned  char  md[16];
+
+	char  buf1[33]={ '\0' };
+
+	char  tmp[3]={ '\0' };
+
+	int  i;
+
+	MD5_Init(&ctx);
+
+	MD5_Update(&ctx,data, strlen((char*)data));
+
+	MD5_Final(md,&ctx);
+
+	for ( i=0; i<16; i++ ){
+
+		sprintf (tmp, "%02X" ,md[i]);
+
+		strcat (buf1,tmp);
+
+	}
+
+		if(strcmp(buf1,rq.MD5)!=0){
+			cout<<"ckernel MD5:"<<buf1<<endl;
+			cout<<"rq MD5:"<<rq.MD5<<endl;
+			memset(rq.content,0,sizeof(rq.content));
+			strcpy(rq.content,"unsafe");
+
+			send(ISendIp,(char*)&rq,rq.size,0);
+			return ;
+		}
+
 	if(m_mapUseridToSocket.find(rq.friendName)!= m_mapUseridToSocket.end())
 		send(m_mapUseridToSocket[rq.friendName],(char*)&rq, rq.size,0);
 	else{
@@ -371,7 +409,7 @@ void ckernel::Del_Add_Friend(SOCKET ISendIp, char* buf, int len)
 	list<string> listRes;
 
 	STRU_ADD rs;
-	
+
 	char sqlBuf[1024] = "";
 	sprintf(sqlBuf, "select userid,status from  t_user where userid ='%s';", rq->friendName);
 	//如果只用rq->tel查询password,userid   就可以不用那么多  pop_front();去清除无用信息了
@@ -402,7 +440,7 @@ void ckernel::Del_Add_Friend(SOCKET ISendIp, char* buf, int len)
 		}
 
 		strcpy(rs.userName, rq->userName);
-		
+
 		cout << rs.friendName << "  " << rs.userName << endl;
 		//仅仅转发消息给请求方
 		cout << "已发送好友请求" << endl;
@@ -447,7 +485,7 @@ void ckernel::Del_Join(SOCKET ISendIp, char* buf, int len)
 		send(ISendIp, (char*)&rq, rq.size,0);
 		return;
 	}
-	
+
 	while (listRes.size() > 0) listRes.pop_front();
 	memset(sqlBuf, 0, sizeof(sqlBuf));
 	//得到房主名字

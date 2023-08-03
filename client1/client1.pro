@@ -10,7 +10,6 @@ CONFIG += c++11
 
 SOURCES += \
     #../3_07_network/sychatdialog.cpp \
-    MD5.cpp \
     NET.cpp \
     NetMediator.cpp \
     addfriend.cpp \
@@ -26,6 +25,7 @@ SOURCES += \
     houseuserlist.cpp \
     main.cpp \
     mainwindow.cpp \
+    md5.cpp \
     talkinfo.cpp
 
 HEADERS += \
@@ -45,6 +45,7 @@ HEADERS += \
     housename.h \
     houseuserlist.h \
     mainwindow.h \
+    md5.h \
     talkinfo.h
 
 FORMS += \

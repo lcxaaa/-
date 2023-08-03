@@ -3,7 +3,7 @@
 
 #define _Thread_Pool_question_ 1
 #include"MyDefine.h"
-
+#include<openssl/md5.h>
 typedef struct thread_pool{
 	int max;
 	int min;

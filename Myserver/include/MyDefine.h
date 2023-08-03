@@ -13,6 +13,7 @@
 #include<sys/socket.h>
 #include<netinet/in.h>
 #include<sys/types.h>
+#include<openssl/md5.h>
 
 typedef int SOCKET;
 
@@ -203,6 +204,7 @@ struct STRU_CHAR {
 	char szName[_DEF_NAME_SIZE_];
 	char friendName[_DEF_NAME_SIZE_];
 	char content[_DEF_CONTENT_SIZE];
+	char MD5[40];
 };
 
 //好友信息协议包 

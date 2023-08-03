@@ -1058,8 +1058,4 @@ void  Game::on_Deal_AIgame(){
     AIandPlayDraw(1);
 }
 
-void Game::on_GameChat_clicked()
-{
-    emit void on_sendGameChatMsg();
-}
 

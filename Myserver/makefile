@@ -1,5 +1,5 @@
 CC = g++ -std=c++11
-CFLAGS = -lpthread -lmysqlclient -I./include/
+CFLAGS = -lpthread -lmysqlclient -lcrypto -I./include/
 
 TARGET  = ./app
 OBJ_DIR = ./obj
