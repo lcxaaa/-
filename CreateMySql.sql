@@ -21,7 +21,7 @@ create table t_house(
     username varchar(10)  ,
     AImode int default 0
 );
-create index houseIndex on t_house(username);
+create index houseIndex on t_house(housename,username);
 
  create table t_score( 
  userid varchar(20) primary key,
